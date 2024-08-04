@@ -11,6 +11,12 @@ public class WreckingCycle : MonoBehaviour
 	[SerializeField, Range(0f, 100f)]
 	float maxSpeed = 10f;
 
+	[SerializeField, Range(0f, 100f)]
+	float maxAcceleration = 10f, maxAirAcceleration = 1f;
+
+	[SerializeField, Range(0f, 10f)]
+	float jumpHeight = 2f;
+
 	Vector2 playerInput = Vector2.zero;
 	Rigidbody rb;
 	Vector2 velocity, desiredVelocity;
@@ -67,7 +73,7 @@ public class WreckingCycle : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		
+		rb.velocity += new Vector3(desiredVelocity.x,0,desiredVelocity.y);
 	}
 
 	void Jump(InputAction.CallbackContext context)
