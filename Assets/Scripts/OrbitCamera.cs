@@ -145,6 +145,10 @@ public class OrbitCamera : MonoBehaviour
 
 	bool ManualRotation()
 	{
+		if (!Application.isFocused)
+		{
+			return false;
+		}
 		Vector2 rawInput = look.ReadValue<Vector2>();
 		Vector2 input = new Vector2(rawInput.y,rawInput.x);
 		const float e = 0.001f;
