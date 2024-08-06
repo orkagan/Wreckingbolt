@@ -1850,9 +1850,10 @@ MonoBehaviour:
   maxSpeed: 1000
   maxAcceleration: 500
   maxAirAcceleration: 1
+  turnSpeed: 10
   slowTorque: 10
   jumpHeight: 2
-  maxTilt: 100
+  maxTilt: 60
 --- !u!114 &1393720602
 MonoBehaviour:
   m_ObjectHideFlags: 0
