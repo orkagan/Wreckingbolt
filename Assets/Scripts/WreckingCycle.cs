@@ -16,7 +16,7 @@ public class WreckingCycle : MonoBehaviour
 	[SerializeField]
 	float maxAcceleration = 10f, maxAirAcceleration = 1f;
 	[SerializeField]
-	float turnSpeed = 10f;
+	AnimationCurve turnSpeedCurve;
 
 	[SerializeField]
 	public float slowTorque = 10f;
@@ -116,7 +116,9 @@ public class WreckingCycle : MonoBehaviour
 
 			//Turn to desired direction
 			Quaternion lookTarget = Quaternion.LookRotation(desiredVelocity, transform.up);
-			transform.rotation = Quaternion.Lerp(transform.rotation, lookTarget, 0.1f);
+			//float turnSpeed = turnSpeedCurve.Evaluate();
+			float turnSpeed = 0.1f;
+			transform.rotation = Quaternion.Lerp(transform.rotation, lookTarget, turnSpeed);
 			//Accelerate wheel
 			wheel.motorTorque = desiredVelocity.magnitude;
 			wheel.brakeTorque = 0f;
