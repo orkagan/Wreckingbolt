@@ -38,24 +38,28 @@ public class MovingSphere : MonoBehaviour
 
 	Vector3 contactNormal, steepNormal;
 
-	int groundContactCount;
+	int groundContactCount, steepContactCount;
 
 	bool OnGround => groundContactCount > 0;
 
+	bool OnSteep => steepContactCount > 0;
+
 	int jumpPhase;
 
-	int stepsSinceLastGrounded, stepsSinceLastJump;
+	float minGroundDotProduct, minStairsDotProduct;
 
-	float minGroundDotProduct;
+	int stepsSinceLastGrounded, stepsSinceLastJump;
 
 	void OnValidate()
 	{
 		minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
+		minStairsDotProduct = Mathf.Cos(maxStairsAngle * Mathf.Deg2Rad);
 	}
 
 	void Awake()
 	{
 		body = GetComponent<Rigidbody>();
+		OnValidate();
 	}
 
 	void Update()
@@ -102,7 +106,7 @@ public class MovingSphere : MonoBehaviour
 
 	void ClearState()
 	{
-		groundContactCount = 0;
+		groundContactCount = steepContactCount = 0;
 		contactNormal = steepNormal = Vector3.zero;
 	}
 
@@ -111,8 +115,7 @@ public class MovingSphere : MonoBehaviour
 		stepsSinceLastGrounded += 1;
 		stepsSinceLastJump += 1;
 		velocity = body.velocity;
-		//if (OnGround || SnapToGround() || CheckSteepContacts())
-		if (OnGround)
+		if (OnGround || SnapToGround() || CheckSteepContacts())
 		{
 			stepsSinceLastGrounded = 0;
 			if (stepsSinceLastJump > 1)
@@ -128,6 +131,55 @@ public class MovingSphere : MonoBehaviour
 		{
 			contactNormal = Vector3.up;
 		}
+	}
+
+	bool SnapToGround()
+	{
+		if (stepsSinceLastGrounded > 1 || stepsSinceLastJump <= 2)
+		{
+			return false;
+		}
+		float speed = velocity.magnitude;
+		if (speed > maxSnapSpeed)
+		{
+			return false;
+		}
+		if (!Physics.Raycast(
+			body.position, Vector3.down, out RaycastHit hit,
+			probeDistance, probeMask
+		))
+		{
+			return false;
+		}
+		if (hit.normal.y < GetMinDot(hit.collider.gameObject.layer))
+		{
+			return false;
+		}
+
+		groundContactCount = 1;
+		contactNormal = hit.normal;
+		float dot = Vector3.Dot(velocity, hit.normal);
+		if (dot > 0f)
+		{
+			velocity = (velocity - hit.normal * dot).normalized * speed;
+		}
+		return true;
+	}
+
+	bool CheckSteepContacts()
+	{
+		if (steepContactCount > 1)
+		{
+			steepNormal.Normalize();
+			if (steepNormal.y >= minGroundDotProduct)
+			{
+				steepContactCount = 0;
+				groundContactCount = 1;
+				contactNormal = steepNormal;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void AdjustVelocity()
@@ -156,6 +208,11 @@ public class MovingSphere : MonoBehaviour
 		{
 			jumpDirection = contactNormal;
 		}
+		else if (OnSteep)
+		{
+			jumpDirection = steepNormal;
+			jumpPhase = 0;
+		}
 		else if (maxAirJumps > 0 && jumpPhase <= maxAirJumps)
 		{
 			if (jumpPhase == 0)
@@ -178,7 +235,6 @@ public class MovingSphere : MonoBehaviour
 		{
 			jumpSpeed = Mathf.Max(jumpSpeed - alignedSpeed, 0f);
 		}
-		if(velocity.y < 0) velocity.y = 0;
 		velocity += jumpDirection * jumpSpeed;
 	}
 
@@ -194,13 +250,19 @@ public class MovingSphere : MonoBehaviour
 
 	void EvaluateCollision(Collision collision)
 	{
+		float minDot = GetMinDot(collision.gameObject.layer);
 		for (int i = 0; i < collision.contactCount; i++)
 		{
 			Vector3 normal = collision.GetContact(i).normal;
-			if (normal.y >= minGroundDotProduct)
+			if (normal.y >= minDot)
 			{
 				groundContactCount += 1;
 				contactNormal += normal;
+			}
+			else if (normal.y > -0.01f)
+			{
+				steepContactCount += 1;
+				steepNormal += normal;
 			}
 		}
 	}
@@ -208,5 +270,11 @@ public class MovingSphere : MonoBehaviour
 	Vector3 ProjectOnContactPlane(Vector3 vector)
 	{
 		return vector - contactNormal * Vector3.Dot(vector, contactNormal);
+	}
+
+	float GetMinDot(int layer)
+	{
+		return (stairsMask & (1 << layer)) == 0 ?
+			minGroundDotProduct : minStairsDotProduct;
 	}
 }
