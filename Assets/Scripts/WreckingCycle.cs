@@ -123,7 +123,7 @@ public class WreckingCycle : MonoBehaviour
 
 		//visual tilt when turning
 		Vector3 tiltSide = Vector3.Cross(transform.forward.normalized, rb.velocity.normalized);
-		visualTilt.localRotation = Quaternion.Euler(0, 0, maxTilt * tiltSide.y);
+		visualTilt.localRotation = Quaternion.Slerp(visualTilt.localRotation, Quaternion.Euler(0, 0, maxTilt * tiltSide.y), Time.deltaTime *10f);
 
 		Debug.DrawLine(transform.position, transform.position + desiredVelocity, Color.blue);
 		Debug.DrawLine(transform.position, transform.position + rb.velocity, Color.red);
@@ -140,7 +140,7 @@ public class WreckingCycle : MonoBehaviour
 		stepsSinceLastGrounded += 1;
 		stepsSinceLastJump += 1;
 		velocity = rb.velocity;
-		if (OnGround /*|| SnapToGround()*/ || CheckSteepContacts())
+		if (OnGround /*|| SnapToGround()*/ || CheckSteepContacts() || wheel.isGrounded)
 		{
 			stepsSinceLastGrounded = 0;
 			if (stepsSinceLastJump > 1)

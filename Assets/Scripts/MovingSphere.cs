@@ -100,6 +100,14 @@ public class MovingSphere : MonoBehaviour
 			Jump();
 		}
 
+		//jank scaling attempt
+		Debug.Log($"Grounded: {groundContactCount}");
+		if (groundContactCount > 0)
+		{
+			Debug.Log($"Enbiggening");
+			transform.localScale *= 1f+(body.velocity.magnitude * 0.0002f);
+		}
+
 		body.velocity = velocity;
 		ClearState();
 	}
