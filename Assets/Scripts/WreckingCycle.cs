@@ -44,7 +44,6 @@ public class WreckingCycle : MonoBehaviour
 
 	Vector2 playerInput = Vector2.zero;
 	Rigidbody rb;
-	WheelCollider wheel;
 
 	Vector3 velocity, desiredVelocity;
 	bool desiredJump;
@@ -82,7 +81,6 @@ public class WreckingCycle : MonoBehaviour
 	void Start()
     {
 		rb = GetComponent<Rigidbody>();
-		wheel = GetComponent<WheelCollider>();
     }
     
     void Update()
@@ -123,7 +121,7 @@ public class WreckingCycle : MonoBehaviour
 
 		//visual tilt when turning
 		Vector3 tiltSide = Vector3.Cross(transform.forward.normalized, rb.velocity.normalized);
-		visualTilt.localRotation = Quaternion.Slerp(visualTilt.localRotation, Quaternion.Euler(0, 0, maxTilt * tiltSide.y), Time.deltaTime *10f);
+		visualTilt.localRotation = Quaternion.Slerp(visualTilt.localRotation, Quaternion.Euler(0, 0, maxTilt * tiltSide.y), Time.deltaTime * 10f);
 
 		Debug.DrawLine(transform.position, transform.position + desiredVelocity, Color.blue);
 		Debug.DrawLine(transform.position, transform.position + rb.velocity, Color.red);
@@ -140,7 +138,7 @@ public class WreckingCycle : MonoBehaviour
 		stepsSinceLastGrounded += 1;
 		stepsSinceLastJump += 1;
 		velocity = rb.velocity;
-		if (OnGround /*|| SnapToGround()*/ || CheckSteepContacts() || wheel.isGrounded)
+		if (OnGround /*|| SnapToGround()*/ || CheckSteepContacts())
 		{
 			stepsSinceLastGrounded = 0;
 			if (stepsSinceLastJump > 1)
@@ -209,6 +207,7 @@ public class WreckingCycle : MonoBehaviour
 
 	void AdjustVelocity()
 	{
+		//Basic velocity towards direction
 		/*float maxSpeedChange = maxAcceleration * Time.deltaTime;
 		velocity.x =
 			Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
@@ -216,40 +215,30 @@ public class WreckingCycle : MonoBehaviour
 			Mathf.MoveTowards(velocity.z, desiredVelocity.z, maxSpeedChange);*/
 
 		//Trying rotational/torque based movement;
-		/*Vector3 desiredRotVelocity = new Vector3(desiredVelocity.z, 0, -desiredVelocity.x);
-		rb.AddTorque(desiredRotVelocity);*/
+		Vector3 desiredRotVelocity = new Vector3(desiredVelocity.z, 0, -desiredVelocity.x);
+		//rb.AddTorque(desiredRotVelocity);
 
-		//Trying Wheel collider
 		if (desiredVelocity.magnitude > 0.1f)
 		{
-			/*if (playerInput.y > -0.5f)
-			{
-				Quaternion lookTarget = Quaternion.LookRotation(desiredVelocity, transform.up);
-				transform.rotation = Quaternion.Lerp(transform.rotation, lookTarget, 0.1f);
-				wheel.motorTorque = desiredVelocity.magnitude;
-			}
-			//Reverse if player inputs backwards enough
-			else if (playerInput.y < 0.5f)
-			{
-				Quaternion lookTarget = Quaternion.LookRotation(-desiredVelocity, transform.up);
-				transform.rotation = Quaternion.Lerp(transform.rotation, lookTarget, 0.1f);
-				wheel.motorTorque = -desiredVelocity.magnitude;
-			}*/
-
 			//Turn to desired direction
-			Quaternion lookTarget = Quaternion.LookRotation(desiredVelocity, transform.up);
+			//Quaternion lookTarget = Quaternion.LookRotation(desiredVelocity, Vector3.up);
 			//float turnSpeed = turnSpeedCurve.Evaluate();
 			float turnSpeed = 0.05f;
-			transform.rotation = Quaternion.Lerp(transform.rotation, lookTarget, turnSpeed);
-			//Accelerate wheel
-			wheel.motorTorque = desiredVelocity.magnitude;
-			wheel.brakeTorque = 0f;
-		}
-		else
-		{
-			visualTilt.localRotation = Quaternion.identity;
-			wheel.motorTorque = 0f;
-			wheel.brakeTorque = slowTorque;
+			//transform.rotation = Quaternion.Lerp(transform.rotation, lookTarget, turnSpeed);
+			//transform.Rotate(Vector3.up, Vector3.Angle(rb.angularVelocity,desiredVelocity), Space.World);
+			transform.Rotate(Vector3.up, 1f, Space.World);
+
+			//rb.AddTorque(desiredRotVelocity);
+			/*Vector3 tiltSide = Vector3.Cross(transform.forward.normalized, rb.velocity.normalized);
+			if (Vector3.Cross(transform.up, contactNormal).magnitude > 0.1f)
+			{
+				rb.AddTorque(transform.forward * -tiltSide.y);
+			}*/
+
+			Debug.Log(rb.angularVelocity);
+
+			rb.AddTorque(transform.right * desiredVelocity.magnitude);
+			//rb.AddRelativeTorque(desiredVelocity.magnitude,0,0);
 		}
 	}
 
