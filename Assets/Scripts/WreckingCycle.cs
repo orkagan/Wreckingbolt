@@ -13,12 +13,12 @@ public class WreckingCycle : MonoBehaviour
 	[SerializeField]
 	float maxSpeed = 10f;
 
-	[SerializeField]
+	/*[SerializeField]
 	float maxAcceleration = 10f;
-	[SerializeField]
-	AnimationCurve turnSpeedCurve;
+    [SerializeField]
+    AnimationCurve turnSpeedCurve;*/
 
-	[SerializeField]
+    [SerializeField]
 	public float slowTorque = 10f;
 
 	[SerializeField]
@@ -27,8 +27,8 @@ public class WreckingCycle : MonoBehaviour
 	[SerializeField, Range(0, 5)]
 	int maxAirJumps = 0;
 
-	[SerializeField, Range(0, 90)]
-	float maxGroundAngle = 25f, maxStairsAngle = 50f;
+	/*[SerializeField, Range(0, 90)]
+	float maxGroundAngle = 25f, maxStairsAngle = 50f;*/
 
 	[SerializeField, Range(0f, 100f)]
 	float maxSnapSpeed = 100f;
@@ -223,10 +223,10 @@ public class WreckingCycle : MonoBehaviour
 			//Turn to desired direction
 			//Quaternion lookTarget = Quaternion.LookRotation(desiredVelocity, Vector3.up);
 			//float turnSpeed = turnSpeedCurve.Evaluate();
-			float turnSpeed = 0.05f;
+			float turnSpeed = 1f;
 			//transform.rotation = Quaternion.Lerp(transform.rotation, lookTarget, turnSpeed);
 			//transform.Rotate(Vector3.up, Vector3.Angle(rb.angularVelocity,desiredVelocity), Space.World);
-			transform.Rotate(Vector3.up, 1f, Space.World);
+			transform.Rotate(Vector3.up, turnSpeed, Space.World);
 
 			//rb.AddTorque(desiredRotVelocity);
 			/*Vector3 tiltSide = Vector3.Cross(transform.forward.normalized, rb.velocity.normalized);

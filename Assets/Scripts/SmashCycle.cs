@@ -94,17 +94,23 @@ public class SmashCycle : MonoBehaviour
 
 		visualSeat.rotation = Quaternion.Slerp(visualSeat.rotation, lookDir, Time.deltaTime * 2f);
 
-		//Ball rotation
-		Vector3 ballTiltSide = Vector3.Cross(vehicleBody.forward.normalized, rb.velocity.normalized);
-		float ballTiltAmount = Vector3.Angle(vehicleBody.forward.normalized, rb.velocity.normalized) * velocity.magnitude / 10f;
-		Quaternion ballTilt = Quaternion.Euler(0, 0, Mathf.Clamp(ballTiltAmount, 0f, 60f) * ballTiltSide.y);
-		visualBall.localRotation = Quaternion.Slerp(visualBall.localRotation, ballTilt, Time.deltaTime * 10f);
+        //Ball rotation
+        Vector3 ballTiltSide = Vector3.Cross(vehicleBody.forward.normalized, rb.velocity.normalized);
+        float ballTiltAmount = Vector3.Angle(vehicleBody.forward.normalized, rb.velocity.normalized) * velocity.magnitude / 10f;
+        Quaternion ballTilt = Quaternion.Euler(0, 0, Mathf.Clamp(ballTiltAmount, 0f, 60f) * ballTiltSide.y);
+        visualBall.localRotation = Quaternion.Slerp(visualBall.localRotation, ballTilt, Time.deltaTime * 10f);
 
-		//Debug vectors
-		Debug.DrawLine(transform.position, transform.position + desiredVelocity, Color.blue);
-		Debug.DrawLine(transform.position, transform.position + tiltSide, Color.green);
-		Debug.DrawLine(transform.position, transform.position + rb.velocity, Color.red);
-	}
+        //Ball Roll
+        float rollAmount = rb.velocity.magnitude * (180f / Mathf.PI) / 0.5f;
+        visualBall.Rotate(rollAmount * Time.deltaTime, 0, 0);
+        //visualBall.rotation = transform.rotation;
+
+        //Debug vectors
+        //Debug.DrawLine(transform.position, transform.position + rb.angularVelocity, Color.yellow);
+        Debug.DrawLine(transform.position, transform.position + desiredVelocity, Color.blue);
+        Debug.DrawLine(transform.position, transform.position + tiltSide, Color.green);
+        Debug.DrawLine(transform.position, transform.position + rb.velocity, Color.red);
+    }
 
 	private void FixedUpdate()
 	{
@@ -122,9 +128,13 @@ public class SmashCycle : MonoBehaviour
 		velocity.x = Mathf.MoveTowards(velocity.x, vehicleBody.forward.x * desiredVelocity.magnitude, maxSpeedChange);
 		velocity.z = Mathf.MoveTowards(velocity.z, vehicleBody.forward.z * desiredVelocity.magnitude, maxSpeedChange);
 
+
 		//TODO: Tire side friction
 		
 
-		rb.velocity = velocity;
+		//Appply forces
+		//rb.angularVelocity += vehicleBody.right * desiredVelocity;
+		rb.AddTorque(vehicleBody.right * desiredVelocity.magnitude * 100f);
+		//rb.velocity = velocity;
 	}
 }
