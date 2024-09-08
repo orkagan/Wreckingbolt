@@ -24,6 +24,8 @@ public class SmashCycle : MonoBehaviour
 	Vector3 desiredVelocity;
 	[SerializeField]
 	Vector3 velocity;
+	[SerializeField]
+	float wheelRollspeed;
 	#endregion
 	#region Controls/Inputs
 	PlayerInputActions playerControls;
@@ -86,7 +88,8 @@ public class SmashCycle : MonoBehaviour
 		Quaternion lookDir = vehicleBody.rotation;
 		if (desiredVelocity.magnitude > 0.1f)
 		{
-			lookDir = Quaternion.LookRotation(desiredVelocity, Vector3.up); //TODO: replace Vector3.up with contact normal
+			//TODO: replace Vector3.up with contact normal
+			lookDir = Quaternion.LookRotation(desiredVelocity, Vector3.up);
 		}
 		Vector3 tiltSide = Vector3.Cross(desiredVelocity.normalized, rb.velocity.normalized);
 		//visualSeat.localEulerAngles = new Vector3(visualSeat.localEulerAngles.x, visualSeat.localEulerAngles.y, 60f * tiltSide.y);
@@ -101,9 +104,13 @@ public class SmashCycle : MonoBehaviour
         visualBall.localRotation = Quaternion.Slerp(visualBall.localRotation, ballTilt, Time.deltaTime * 10f);
 
         //Ball Roll
-        float rollAmount = rb.velocity.magnitude * (180f / Mathf.PI) / 0.5f;
-        visualBall.Rotate(rollAmount * Time.deltaTime, 0, 0);
-        //visualBall.rotation = transform.rotation;
+        wheelRollspeed = Vector3.Dot(rb.angularVelocity.normalized, vehicleBody.right.normalized) * rb.angularVelocity.magnitude;
+		//float rollAmount = rb.velocity.magnitude * (180f / Mathf.PI) / 0.5f;
+		/*if (wheelRollspeed > 1f)
+		{
+			visualBall.Rotate(wheelRollspeed, 0, 0);
+		}*/
+		//visualBall.Rotate(1f, 0, 0);
 
         //Debug vectors
         //Debug.DrawLine(transform.position, transform.position + rb.angularVelocity, Color.yellow);
@@ -130,7 +137,7 @@ public class SmashCycle : MonoBehaviour
 
 
 		//TODO: Tire side friction
-		
+		Vector3 friction = Vector3.Dot(rb.velocity.normalized, vehicleBody.right.normalized) * -1 * rb.velocity;
 
 		//Appply forces
 		//rb.angularVelocity += vehicleBody.right * desiredVelocity;

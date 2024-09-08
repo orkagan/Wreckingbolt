@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Shader Graphs_Wheel
+  m_Name: Hexwheel_Mat
   m_Shader: {fileID: -6465566751694194690, guid: b4f4ce6c5f2733044be92aa1eacc5887,
     type: 3}
   m_Parent: {fileID: 0}
@@ -54,7 +54,8 @@ Material:
     - _Hexagon_Scale_Size: 15
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Smoothness: 0.139
     m_Colors:
-    - _Base_Colour: {r: 0.2830189, g: 0.2830189, b: 0.2830189, a: 0}
-    - _Glow_Colour: {r: 0, g: 1.5296717, b: 2, a: 0}
+    - _Base_Colour: {r: 0, g: 0, b: 0, a: 0}
+    - _Glow_Colour: {r: 0, g: 1.1457541, b: 1.4980392, a: 0}
   m_BuildTextureStacks: []
