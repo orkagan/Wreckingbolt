@@ -9,23 +9,26 @@ public class SmashCycle : MonoBehaviour
 	[Header("Parameters")]
 	[SerializeField] float maxSpeed = 20f;
 	[SerializeField] float maxAcceleration = 10f;
+	[SerializeField, Range(0,1)] float frictionCoefficient = 0.02f;
 	#endregion
 	#region References
 	[Header("References")]
 	[SerializeField] Transform playerInputSpace = default;
-	public Transform vehicleBody;
-	public Transform visualBall;
-	public Transform visualSeat;
+	public Transform vehicleBody_tf;
+	public Transform tilt_tf;
+	public Transform wheel_tf;
+	public Transform seat_tf;
 
 	Rigidbody rb;
 	#endregion
 	#region Internal Variables
 	Vector2 playerInputMove;
 	Vector3 desiredVelocity;
+	Vector3 sideFriction;
 	[SerializeField]
 	Vector3 velocity;
 	[SerializeField]
-	float wheelRollspeed;
+	float wheelRollSpeed;
 	#endregion
 	#region Controls/Inputs
 	PlayerInputActions playerControls;
@@ -57,8 +60,8 @@ public class SmashCycle : MonoBehaviour
 		rb = GetComponent<Rigidbody>();
 
 		//unparent hover seat (also keep it near in hierarchy)
-		vehicleBody.SetParent(null, true);
-		vehicleBody.SetSiblingIndex(transform.GetSiblingIndex());
+		vehicleBody_tf.SetParent(null, true);
+		vehicleBody_tf.SetSiblingIndex(transform.GetSiblingIndex());
     }
 
     private void Update()
@@ -82,39 +85,34 @@ public class SmashCycle : MonoBehaviour
 		}
 
 		//Vehicle body copy position
-		vehicleBody.position = transform.position;
+		vehicleBody_tf.position = transform.position;
 
 		//Seat rotation
-		Quaternion lookDir = vehicleBody.rotation;
+		Quaternion lookDir = vehicleBody_tf.rotation;
 		if (desiredVelocity.magnitude > 0.1f)
 		{
 			//TODO: replace Vector3.up with contact normal
 			lookDir = Quaternion.LookRotation(desiredVelocity, Vector3.up);
 		}
 		Vector3 tiltSide = Vector3.Cross(desiredVelocity.normalized, rb.velocity.normalized);
-		//visualSeat.localEulerAngles = new Vector3(visualSeat.localEulerAngles.x, visualSeat.localEulerAngles.y, 60f * tiltSide.y);
 		lookDir.eulerAngles = new Vector3(lookDir.eulerAngles.x, lookDir.eulerAngles.y, 60f * tiltSide.y);
 
-		visualSeat.rotation = Quaternion.Slerp(visualSeat.rotation, lookDir, Time.deltaTime * 2f);
+		seat_tf.rotation = Quaternion.Lerp(seat_tf.rotation, lookDir, Time.deltaTime * 2f);
 
-        //Ball rotation
-        Vector3 ballTiltSide = Vector3.Cross(vehicleBody.forward.normalized, rb.velocity.normalized);
-        float ballTiltAmount = Vector3.Angle(vehicleBody.forward.normalized, rb.velocity.normalized) * velocity.magnitude / 10f;
-        Quaternion ballTilt = Quaternion.Euler(0, 0, Mathf.Clamp(ballTiltAmount, 0f, 60f) * ballTiltSide.y);
-        visualBall.localRotation = Quaternion.Slerp(visualBall.localRotation, ballTilt, Time.deltaTime * 10f);
+		//Ball Tilt
+        Vector3 ballTiltSide = Vector3.Cross(vehicleBody_tf.forward.normalized, rb.velocity.normalized);
+        float ballTiltAmount = Vector3.Angle(vehicleBody_tf.forward.normalized, rb.velocity.normalized) * velocity.magnitude / 10f;
+		Quaternion ballTilt = Quaternion.Euler(tilt_tf.eulerAngles.x, 0, Mathf.Clamp(ballTiltAmount, 0f, 60f) * ballTiltSide.y);
+		tilt_tf.localRotation = Quaternion.Lerp(tilt_tf.localRotation, ballTilt, Time.deltaTime * 10f);
 
-        //Ball Roll
-        wheelRollspeed = Vector3.Dot(rb.angularVelocity.normalized, vehicleBody.right.normalized) * rb.angularVelocity.magnitude;
-		//float rollAmount = rb.velocity.magnitude * (180f / Mathf.PI) / 0.5f;
-		/*if (wheelRollspeed > 1f)
-		{
-			visualBall.Rotate(wheelRollspeed, 0, 0);
-		}*/
-		//visualBall.Rotate(1f, 0, 0);
+		//Wheel Roll
+		wheelRollSpeed = Mathf.Rad2Deg * Vector3.Dot(rb.angularVelocity, vehicleBody_tf.right.normalized);
+		wheel_tf.Rotate(Vector3.right, wheelRollSpeed * Time.deltaTime);
 
-        //Debug vectors
-        //Debug.DrawLine(transform.position, transform.position + rb.angularVelocity, Color.yellow);
-        Debug.DrawLine(transform.position, transform.position + desiredVelocity, Color.blue);
+		//Debug vectors
+		//Debug.DrawLine(transform.position, transform.position + rb.angularVelocity, Color.yellow);
+		Debug.DrawLine(transform.position, transform.position + desiredVelocity, Color.blue);
+        Debug.DrawLine(transform.position, transform.position + sideFriction, Color.yellow);
         Debug.DrawLine(transform.position, transform.position + tiltSide, Color.green);
         Debug.DrawLine(transform.position, transform.position + rb.velocity, Color.red);
     }
@@ -130,18 +128,20 @@ public class SmashCycle : MonoBehaviour
 			Quaternion lookTarget = Quaternion.LookRotation(desiredVelocity, Vector3.up);
 			//float turnSpeed = turnSpeedCurve.Evaluate();
 			float turnSpeed = 0.05f;
-			vehicleBody.rotation = Quaternion.Lerp(vehicleBody.rotation, lookTarget, turnSpeed);
+			vehicleBody_tf.rotation = Quaternion.Lerp(vehicleBody_tf.rotation, lookTarget, turnSpeed);
 		}
-		velocity.x = Mathf.MoveTowards(velocity.x, vehicleBody.forward.x * desiredVelocity.magnitude, maxSpeedChange);
-		velocity.z = Mathf.MoveTowards(velocity.z, vehicleBody.forward.z * desiredVelocity.magnitude, maxSpeedChange);
+		velocity.x = Mathf.MoveTowards(velocity.x, vehicleBody_tf.forward.x * desiredVelocity.magnitude, maxSpeedChange);
+		velocity.z = Mathf.MoveTowards(velocity.z, vehicleBody_tf.forward.z * desiredVelocity.magnitude, maxSpeedChange);
 
 
-		//TODO: Tire side friction
-		Vector3 friction = Vector3.Dot(rb.velocity.normalized, vehicleBody.right.normalized) * -1 * rb.velocity;
+		//Tire side friction
+		//TODO: make friction asymptotic curve
+		sideFriction = Vector3.Dot(rb.velocity, vehicleBody_tf.right.normalized) * -frictionCoefficient * vehicleBody_tf.right.normalized;
+		rb.velocity += sideFriction;
 
 		//Appply forces
-		//rb.angularVelocity += vehicleBody.right * desiredVelocity;
-		rb.AddTorque(vehicleBody.right * desiredVelocity.magnitude * 100f);
 		//rb.velocity = velocity;
+		//rb.angularVelocity += vehicleBody.right * desiredVelocity;
+		rb.AddTorque(vehicleBody_tf.right * desiredVelocity.magnitude * 100f);
 	}
 }

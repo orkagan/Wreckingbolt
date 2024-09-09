@@ -51,11 +51,12 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Hexagon_Gap: 0.993
     - _Hexagon_Scale_Size: 15
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Smoothness: 0.139
     m_Colors:
     - _Base_Colour: {r: 0, g: 0, b: 0, a: 0}
-    - _Glow_Colour: {r: 0, g: 1.1457541, b: 1.4980392, a: 0}
+    - _Glow_Colour: {r: 1.4980392, g: 0.48212233, b: 0, a: 0}
   m_BuildTextureStacks: []
