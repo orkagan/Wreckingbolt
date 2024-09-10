@@ -32,7 +32,7 @@ public class SmashCycle : MonoBehaviour
 	#endregion
 	#region Controls/Inputs
 	PlayerInputActions playerControls;
-	private InputAction move, jump;
+	private InputAction move, jump, boost;
 
 	private void Awake()
 	{
@@ -46,12 +46,17 @@ public class SmashCycle : MonoBehaviour
 
 		jump = playerControls.Player.Jump;
 		jump.Enable();
+
+		boost = playerControls.Player.Boost;
+		boost.Enable();
+		//boost.performed += BoostBurst;
 	}
 
 	private void OnDisable()
 	{
 		move.Disable();
 		jump.Disable();
+		boost.Disable();
 	}
 	#endregion
 
@@ -122,9 +127,11 @@ public class SmashCycle : MonoBehaviour
 		velocity = rb.velocity;
 		float maxSpeedChange = maxAcceleration * Time.deltaTime;
 
+		//0.1f is kinda hardcoded deadzone
 		if (desiredVelocity.magnitude > 0.1f)
 		{
 			//Turn to desired direction
+			//TODO: replace Vector3.up with contact normal
 			Quaternion lookTarget = Quaternion.LookRotation(desiredVelocity, Vector3.up);
 			//float turnSpeed = turnSpeedCurve.Evaluate();
 			float turnSpeed = 0.05f;
@@ -143,5 +150,23 @@ public class SmashCycle : MonoBehaviour
 		//rb.velocity = velocity;
 		//rb.angularVelocity += vehicleBody.right * desiredVelocity;
 		rb.AddTorque(vehicleBody_tf.right * desiredVelocity.magnitude * 100f);
+
+		//Boost
+		//if (Gamepad.current.rightShoulder.IsPressed())
+		if (boost.IsPressed())
+		{
+			BoostHold();
+		}
+	}
+
+	private void BoostBurst(InputAction.CallbackContext context)
+	{
+		Debug.Log("Boost Burst called");
+		rb.AddForce(desiredVelocity.normalized * 100000f);
+	}
+	private void BoostHold()
+	{
+		Debug.Log("Boost Hold called");
+		rb.AddForce(desiredVelocity.normalized * 5000f);
 	}
 }
