@@ -10,6 +10,8 @@ public class SmashCycle : MonoBehaviour
 	[SerializeField] float maxSpeed = 20f;
 	[SerializeField] float maxAcceleration = 10f;
 	[SerializeField, Range(0,1)] float frictionCoefficient = 0.02f;
+	[SerializeField] float jumpHeight = 10f;
+	[SerializeField] float boostPower = 5000f;
 	#endregion
 	#region References
 	[Header("References")]
@@ -18,6 +20,7 @@ public class SmashCycle : MonoBehaviour
 	public Transform tilt_tf;
 	public Transform wheel_tf;
 	public Transform seat_tf;
+	public ParticleSystem jetThrustFX;
 
 	Rigidbody rb;
 	#endregion
@@ -29,6 +32,7 @@ public class SmashCycle : MonoBehaviour
 	Vector3 velocity;
 	[SerializeField]
 	float wheelRollSpeed;
+	bool desiredJump;
 	#endregion
 	#region Controls/Inputs
 	PlayerInputActions playerControls;
@@ -63,6 +67,7 @@ public class SmashCycle : MonoBehaviour
 	private void Start()
     {
 		rb = GetComponent<Rigidbody>();
+		jetThrustFX = GetComponentInChildren<ParticleSystem>();
 
 		//unparent hover seat (also keep it near in hierarchy)
 		vehicleBody_tf.SetParent(null, true);
@@ -89,8 +94,11 @@ public class SmashCycle : MonoBehaviour
 			desiredVelocity = new Vector3(playerInputMove.x, 0f, playerInputMove.y) * maxSpeed;
 		}
 
-		//Vehicle body copy position
-		vehicleBody_tf.position = transform.position;
+		desiredJump |= jump.WasPressedThisFrame();
+
+        #region Visuals using external transforms
+        //Vehicle body copy position
+        vehicleBody_tf.position = transform.position;
 
 		//Seat rotation
 		Quaternion lookDir = vehicleBody_tf.rotation;
@@ -113,12 +121,13 @@ public class SmashCycle : MonoBehaviour
 		//Wheel Roll
 		wheelRollSpeed = Mathf.Rad2Deg * Vector3.Dot(rb.angularVelocity, vehicleBody_tf.right.normalized);
 		wheel_tf.Rotate(Vector3.right, wheelRollSpeed * Time.deltaTime);
+        #endregion
 
-		//Debug vectors
-		//Debug.DrawLine(transform.position, transform.position + rb.angularVelocity, Color.yellow);
-		Debug.DrawLine(transform.position, transform.position + desiredVelocity, Color.blue);
-        Debug.DrawLine(transform.position, transform.position + sideFriction, Color.yellow);
-        Debug.DrawLine(transform.position, transform.position + tiltSide, Color.green);
+        //Debug vectors
+        //Debug.DrawLine(transform.position, transform.position + rb.angularVelocity, Color.yellow);
+        Debug.DrawLine(transform.position, transform.position + desiredVelocity, Color.blue);
+        Debug.DrawLine(transform.position, transform.position + sideFriction * 10f, Color.yellow);
+        //Debug.DrawLine(transform.position, transform.position + tiltSide, Color.green);
         Debug.DrawLine(transform.position, transform.position + rb.velocity, Color.red);
     }
 
@@ -156,17 +165,29 @@ public class SmashCycle : MonoBehaviour
 		if (boost.IsPressed())
 		{
 			BoostHold();
-		}
+			jetThrustFX.Play();
+        }
+        else
+        {
+			jetThrustFX.Stop();
+        }
+
+        if (desiredJump)
+        {
+			desiredJump = false;
+			rb.velocity += Vector3.up * jumpHeight;
+			Debug.Log("Jump!");
+        }
 	}
 
 	private void BoostBurst(InputAction.CallbackContext context)
 	{
 		Debug.Log("Boost Burst called");
-		rb.AddForce(desiredVelocity.normalized * 100000f);
+		rb.AddForce(desiredVelocity.normalized * 200f * boostPower);
 	}
 	private void BoostHold()
 	{
 		Debug.Log("Boost Hold called");
-		rb.AddForce(desiredVelocity.normalized * 5000f);
+		rb.AddForce(desiredVelocity.normalized * boostPower);
 	}
 }
