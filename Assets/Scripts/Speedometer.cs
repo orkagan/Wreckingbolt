@@ -8,6 +8,8 @@ public class Speedometer : MonoBehaviour
     public Rigidbody movingTarget;
     public TMP_Text speedometer;
 
+    [SerializeField] float speed;
+
     void Update()
     {
 		if (movingTarget==null)
@@ -15,6 +17,7 @@ public class Speedometer : MonoBehaviour
             speedometer.text = "KPH\n0";
             return;
 		}
-        speedometer.text = $"KPH\n{Mathf.Floor(movingTarget.velocity.magnitude *3.6f)}";
+        speed = movingTarget.velocity.magnitude;
+        speedometer.text = $"KPH\n{Mathf.Floor(speed*3.6f)}";
     }
 }

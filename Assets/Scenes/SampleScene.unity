@@ -1595,7 +1595,7 @@ Light:
     m_Strength: 1
     m_Bias: 0.05
     m_NormalBias: 0.4
-    m_NearPlane: 0.2
+    m_NearPlane: 2.2
     m_CullingMatrixOverride:
       e00: 1
       e01: 0
@@ -1642,7 +1642,7 @@ Transform:
   m_GameObject: {fileID: 410087039}
   serializedVersion: 2
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalPosition: {x: -2.98, y: 3, z: 2.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2917,7 +2917,7 @@ GameObject:
   - component: {fileID: 876428012}
   - component: {fileID: 876428014}
   - component: {fileID: 876428013}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Smashable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3525,7 +3525,7 @@ GameObject:
   - component: {fileID: 983839744}
   - component: {fileID: 983839743}
   - component: {fileID: 983839742}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Smashable (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9046,7 +9046,7 @@ TrailRenderer:
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.09
+    widthMultiplier: 0.07
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -16560,7 +16560,7 @@ GameObject:
   - component: {fileID: 1984632567}
   - component: {fileID: 1984632566}
   - component: {fileID: 1984632565}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Smashable (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
