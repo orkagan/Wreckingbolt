@@ -8,6 +8,7 @@ public class SmashCycle : MonoBehaviour
 	#region Parameters
 	[Header("Parameters")]
 	[SerializeField] float maxSpeed = 20f;
+	[SerializeField] float maxAngularVelocity = 20f;
 	[SerializeField] float maxAcceleration = 10f;
 	[SerializeField, Range(0,1)] float frictionCoefficient = 0.02f;
 	[SerializeField] float jumpHeight = 10f;
@@ -64,9 +65,13 @@ public class SmashCycle : MonoBehaviour
 	}
 	#endregion
 
+	private void OnValidate()
+	{
+		rb = GetComponent<Rigidbody>();
+		rb.maxAngularVelocity = maxAngularVelocity;
+	}
 	private void Start()
     {
-		rb = GetComponent<Rigidbody>();
 		jetThrustFX = GetComponentInChildren<ParticleSystem>();
 
 		//unparent hover seat (also keep it near in hierarchy)
@@ -157,7 +162,7 @@ public class SmashCycle : MonoBehaviour
 
 		//Appply forces
 		//rb.velocity = velocity;
-		//rb.angularVelocity += vehicleBody.right * desiredVelocity;
+		//rb.angularVelocity += vehicleBody_tf.right * desiredVelocity.magnitude;
 		rb.AddTorque(vehicleBody_tf.right * desiredVelocity.magnitude * 100f);
 
 		//Boost
