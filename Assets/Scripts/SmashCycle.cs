@@ -11,6 +11,17 @@ public class SmashCycle : MonoBehaviour
 	[SerializeField] float maxAngularVelocity = 20f;
 	[SerializeField] float maxAcceleration = 10f;
 	[SerializeField, Range(0,1)] float frictionCoefficient = 0.02f;
+
+	[Header("Colliison Contacts")]
+	[SerializeField, Range(0, 90)]
+	float maxGroundAngle = 25f;
+	[SerializeField, Range(0f, 100f)]
+	float maxSnapSpeed = 100f;
+	[SerializeField, Min(0f)]
+	float probeDistance = 1f;
+	[SerializeField]
+	LayerMask probeMask = -1;
+
 	[SerializeField] float jumpHeight = 10f;
 	[SerializeField] float boostPower = 5000f;
 	#endregion
@@ -31,9 +42,18 @@ public class SmashCycle : MonoBehaviour
 	Vector3 sideFriction;
 	[SerializeField]
 	Vector3 velocity;
+	Vector3 upAxis, rightAxis, forwardAxis;
 	[SerializeField]
 	float wheelRollSpeed;
 	bool desiredJump;
+	[SerializeField] bool onGround;
+	[SerializeField] int groundContactCount;
+	[SerializeField] int steepContactCount;
+	[SerializeField] int stepsSinceLastJump;
+	Vector3 contactNormal;
+	Vector3 steepNormal;
+	[SerializeField] int stepsSinceLastGrounded;
+	float minGroundDotProduct;
 	#endregion
 	#region Controls/Inputs
 	PlayerInputActions playerControls;
@@ -42,6 +62,7 @@ public class SmashCycle : MonoBehaviour
 	private void Awake()
 	{
 		playerControls = new PlayerInputActions();
+		OnValidate();
 	}
 
 	private void OnEnable()
@@ -69,14 +90,14 @@ public class SmashCycle : MonoBehaviour
 	{
 		rb = GetComponent<Rigidbody>();
 		rb.maxAngularVelocity = maxAngularVelocity;
+
+		minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
 	}
 	private void Start()
     {
-		jetThrustFX = GetComponentInChildren<ParticleSystem>();
-
 		//unparent hover seat (also keep it near in hierarchy)
-		vehicleBody_tf.SetParent(null, true);
-		vehicleBody_tf.SetSiblingIndex(transform.GetSiblingIndex());
+		/*vehicleBody_tf.SetParent(null, true);
+		vehicleBody_tf.SetSiblingIndex(transform.GetSiblingIndex());*/
     }
 
     private void Update()
@@ -138,7 +159,10 @@ public class SmashCycle : MonoBehaviour
 
 	private void FixedUpdate()
 	{
-		velocity = rb.velocity;
+		//Vector3 gravity = CustomGravity.GetGravity(rb.position, out upAxis);
+		Vector3 gravity = Physics.gravity;
+		UpdateState();
+		
 		float maxSpeedChange = maxAcceleration * Time.deltaTime;
 
 		//0.1f is kinda hardcoded deadzone
@@ -180,9 +204,69 @@ public class SmashCycle : MonoBehaviour
         if (desiredJump)
         {
 			desiredJump = false;
-			rb.velocity += Vector3.up * jumpHeight;
-			Debug.Log("Jump!");
+			Jump(gravity);
         }
+		ClearState();
+	}
+	
+	void UpdateState()
+	{
+		stepsSinceLastGrounded += 1;
+		stepsSinceLastJump += 1;
+		velocity = rb.velocity;
+		if (onGround || SnapToGround() || CheckSteepContacts())
+		{
+			stepsSinceLastGrounded = 0;
+			if (groundContactCount > 1)
+			{
+				contactNormal.Normalize();
+			}
+		}
+		else
+		{
+			contactNormal = Vector3.up;
+		}
+	}
+
+	bool SnapToGround()
+	{
+		if (stepsSinceLastGrounded > 1 || stepsSinceLastJump <= 2)
+		{
+			return false;
+		}
+		float speed = velocity.magnitude;
+		if (speed > maxSnapSpeed)
+		{
+			return false;
+		}
+		if (!Physics.Raycast(
+			rb.position, -upAxis, out RaycastHit hit,
+			probeDistance, probeMask
+		))
+		{
+			return false;
+		}
+
+		float upDot = Vector3.Dot(upAxis, hit.normal);
+		if (upDot < minGroundDotProduct)
+		{
+			return false;
+		}
+
+		groundContactCount = 1;
+		contactNormal = hit.normal;
+		float dot = Vector3.Dot(velocity, hit.normal);
+		if (dot > 0f)
+		{
+			velocity = (velocity - hit.normal * dot).normalized * speed;
+		}
+		return true;
+	}
+
+	void ClearState()
+	{
+		groundContactCount = steepContactCount = 0;
+		contactNormal = steepNormal = Vector3.zero;
 	}
 
 	private void BoostBurst(InputAction.CallbackContext context)
@@ -194,5 +278,76 @@ public class SmashCycle : MonoBehaviour
 	{
 		Debug.Log("Boost Hold called");
 		rb.AddForce(desiredVelocity.normalized * boostPower);
+	}
+
+	void Jump(Vector3 gravity)
+	{
+		Debug.Log("Jump called");
+		Vector3 jumpDirection;
+		if (onGround)
+		{
+			jumpDirection = contactNormal;
+		}
+		else
+		{
+			return;
+		}
+
+		stepsSinceLastJump = 0;
+		float jumpSpeed = Mathf.Sqrt(2f * gravity.magnitude * jumpHeight);
+		jumpDirection = (jumpDirection + upAxis).normalized;
+		float alignedSpeed = Vector3.Dot(velocity, jumpDirection);
+		if (alignedSpeed > 0f)
+		{
+			jumpSpeed = Mathf.Max(jumpSpeed - alignedSpeed, 0f);
+		}
+		velocity += jumpDirection * jumpSpeed;
+	}
+
+	void OnCollisionEnter(Collision collision)
+	{
+		EvaluateCollision(collision);
+	}
+
+	void OnCollisionExit(Collision collision)
+	{
+		EvaluateCollision(collision);
+	}
+
+	void EvaluateCollision(Collision collision)
+	{
+		float minDot = minGroundDotProduct;
+		for (int i = 0; i < collision.contactCount; i++)
+		{
+			Vector3 normal = collision.GetContact(i).normal;
+			float upDot = Vector3.Dot(upAxis, normal);
+			if (upDot >= minDot)
+			{
+				groundContactCount += 1;
+				contactNormal += normal;
+			}
+			else if (upDot > -0.01f)
+			{
+				steepContactCount += 1;
+				steepNormal += normal;
+			}
+		}
+	}
+
+	bool CheckSteepContacts()
+	{
+		if (steepContactCount > 1)
+		{
+			steepNormal.Normalize();
+			float upDot = Vector3.Dot(upAxis, steepNormal);
+			if (upDot >= minGroundDotProduct)
+			{
+				steepContactCount = 0;
+				groundContactCount = 1;
+				contactNormal = steepNormal;
+				return true;
+			}
+		}
+		return false;
 	}
 }
