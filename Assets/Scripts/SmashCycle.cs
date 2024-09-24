@@ -11,8 +11,9 @@ public class SmashCycle : MonoBehaviour
 	[SerializeField] float maxAngularVelocity = 20f;
 	[SerializeField] float maxAcceleration = 10f;
 	[SerializeField, Range(0,1)] float frictionCoefficient = 0.02f;
+	[SerializeField] float turnSpeed = 0.05f;
 
-	[Header("Colliison Contacts")]
+	[Header("Surface Contact")]
 	[SerializeField, Range(0, 90)]
 	float maxGroundAngle = 25f;
 	[SerializeField, Range(0f, 100f)]
@@ -46,14 +47,12 @@ public class SmashCycle : MonoBehaviour
 	[SerializeField]
 	float wheelRollSpeed;
 	bool desiredJump;
-	[SerializeField] bool onGround;
-	[SerializeField] int groundContactCount;
-	[SerializeField] int steepContactCount;
-	[SerializeField] int stepsSinceLastJump;
-	Vector3 contactNormal;
-	Vector3 steepNormal;
-	[SerializeField] int stepsSinceLastGrounded;
+	bool OnGround => groundContactCount > 0;
+	bool OnSteep => steepContactCount > 0;
+	int groundContactCount, steepContactCount;
+	int stepsSinceLastJump, stepsSinceLastGrounded;
 	float minGroundDotProduct;
+	Vector3 contactNormal, steepNormal;
 	#endregion
 	#region Controls/Inputs
 	PlayerInputActions playerControls;
@@ -90,14 +89,13 @@ public class SmashCycle : MonoBehaviour
 	{
 		rb = GetComponent<Rigidbody>();
 		rb.maxAngularVelocity = maxAngularVelocity;
+		rb.useGravity = false;
 
 		minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
 	}
 	private void Start()
     {
-		//unparent hover seat (also keep it near in hierarchy)
-		/*vehicleBody_tf.SetParent(null, true);
-		vehicleBody_tf.SetSiblingIndex(transform.GetSiblingIndex());*/
+		
     }
 
     private void Update()
@@ -107,18 +105,15 @@ public class SmashCycle : MonoBehaviour
 		//Convert input to camera space, else world space
 		if (playerInputSpace)
 		{
-			Vector3 forward = playerInputSpace.forward;
-			forward.y = 0f;
-			forward.Normalize();
-			Vector3 right = playerInputSpace.right;
-			right.y = 0f;
-			right.Normalize();
-			desiredVelocity = (forward * playerInputMove.y + right * playerInputMove.x) * maxSpeed;
+			rightAxis = ProjectDirectionOnPlane(playerInputSpace.right, upAxis);
+			forwardAxis = ProjectDirectionOnPlane(playerInputSpace.forward, upAxis);
 		}
 		else
 		{
-			desiredVelocity = new Vector3(playerInputMove.x, 0f, playerInputMove.y) * maxSpeed;
+			rightAxis = ProjectDirectionOnPlane(Vector3.right, upAxis);
+			forwardAxis = ProjectDirectionOnPlane(Vector3.forward, upAxis);
 		}
+		desiredVelocity = (rightAxis* playerInputMove.x + forwardAxis * playerInputMove.y) * maxSpeed;
 
 		desiredJump |= jump.WasPressedThisFrame();
 
@@ -131,7 +126,7 @@ public class SmashCycle : MonoBehaviour
 		if (desiredVelocity.magnitude > 0.1f)
 		{
 			//TODO: replace Vector3.up with contact normal
-			lookDir = Quaternion.LookRotation(desiredVelocity, Vector3.up);
+			lookDir = Quaternion.LookRotation(desiredVelocity, upAxis);
 		}
 		Vector3 tiltSide = Vector3.Cross(desiredVelocity.normalized, rb.velocity.normalized);
 		lookDir.eulerAngles = new Vector3(lookDir.eulerAngles.x, lookDir.eulerAngles.y, 60f * tiltSide.y);
@@ -159,35 +154,11 @@ public class SmashCycle : MonoBehaviour
 
 	private void FixedUpdate()
 	{
-		//Vector3 gravity = CustomGravity.GetGravity(rb.position, out upAxis);
-		Vector3 gravity = Physics.gravity;
+		Vector3 gravity = CustomGravity.GetGravity(rb.position, out upAxis);
+		Debug.DrawLine(rb.position, rb.position + upAxis, Color.green);
+		//Vector3 gravity = Physics.gravity; upAxis = Vector3.up;
 		UpdateState();
-		
-		float maxSpeedChange = maxAcceleration * Time.deltaTime;
-
-		//0.1f is kinda hardcoded deadzone
-		if (desiredVelocity.magnitude > 0.1f)
-		{
-			//Turn to desired direction
-			//TODO: replace Vector3.up with contact normal
-			Quaternion lookTarget = Quaternion.LookRotation(desiredVelocity, Vector3.up);
-			//float turnSpeed = turnSpeedCurve.Evaluate();
-			float turnSpeed = 0.05f;
-			vehicleBody_tf.rotation = Quaternion.Lerp(vehicleBody_tf.rotation, lookTarget, turnSpeed);
-		}
-		velocity.x = Mathf.MoveTowards(velocity.x, vehicleBody_tf.forward.x * desiredVelocity.magnitude, maxSpeedChange);
-		velocity.z = Mathf.MoveTowards(velocity.z, vehicleBody_tf.forward.z * desiredVelocity.magnitude, maxSpeedChange);
-
-
-		//Tire side friction
-		//TODO: make friction asymptotic curve
-		sideFriction = Vector3.Dot(rb.velocity, vehicleBody_tf.right.normalized) * -frictionCoefficient * vehicleBody_tf.right.normalized;
-		rb.velocity += sideFriction;
-
-		//Appply forces
-		//rb.velocity = velocity;
-		//rb.angularVelocity += vehicleBody_tf.right * desiredVelocity.magnitude;
-		rb.AddTorque(vehicleBody_tf.right * desiredVelocity.magnitude * 100f);
+		AdjustVelocity();
 
 		//Boost
 		//if (Gamepad.current.rightShoulder.IsPressed())
@@ -206,6 +177,11 @@ public class SmashCycle : MonoBehaviour
 			desiredJump = false;
 			Jump(gravity);
         }
+
+		velocity += gravity * Time.deltaTime;
+
+		rb.velocity = velocity;
+		Debug.Log($"OnGround: {OnGround}");
 		ClearState();
 	}
 	
@@ -214,7 +190,7 @@ public class SmashCycle : MonoBehaviour
 		stepsSinceLastGrounded += 1;
 		stepsSinceLastJump += 1;
 		velocity = rb.velocity;
-		if (onGround || SnapToGround() || CheckSteepContacts())
+		if (OnGround || SnapToGround() || CheckSteepContacts())
 		{
 			stepsSinceLastGrounded = 0;
 			if (groundContactCount > 1)
@@ -228,6 +204,54 @@ public class SmashCycle : MonoBehaviour
 		}
 	}
 
+	bool CheckSteepContacts()
+	{
+		if (steepContactCount > 1)
+		{
+			steepNormal.Normalize();
+			float upDot = Vector3.Dot(upAxis, steepNormal);
+			if (upDot >= minGroundDotProduct)
+			{
+				steepContactCount = 0;
+				groundContactCount = 1;
+				contactNormal = steepNormal;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void AdjustVelocity()
+	{
+		float maxSpeedChange = maxAcceleration * Time.deltaTime;
+
+		//Debug.DrawLine(vehicleBody_tf.position, vehicleBody_tf.position + contactNormal, Color.green);
+		Quaternion lookTarget = Quaternion.LookRotation(vehicleBody_tf.forward, upAxis);
+		//0.1f is kinda hardcoded deadzone
+		if (desiredVelocity.magnitude > 0.1f)
+		{
+			//Turn to desired direction
+			//TODO: replace Vector3.up with contact normal
+			lookTarget = Quaternion.LookRotation(desiredVelocity, upAxis);
+			//float turnSpeed = turnSpeedCurve.Evaluate();
+		}
+		vehicleBody_tf.rotation = Quaternion.Lerp(vehicleBody_tf.rotation, lookTarget, turnSpeed);
+
+
+		//Tire side friction
+		if (OnGround)
+		{
+			//TODO: make friction asymptotic curve
+			sideFriction = Vector3.Dot(velocity, vehicleBody_tf.right.normalized) * -frictionCoefficient * vehicleBody_tf.right.normalized;
+			velocity += sideFriction;
+		}
+
+		//Appply forces
+		//rb.velocity = velocity;
+		//rb.angularVelocity += vehicleBody_tf.right * desiredVelocity.magnitude;
+		rb.AddTorque(vehicleBody_tf.right * desiredVelocity.magnitude * 100f);
+	}
+
 	bool SnapToGround()
 	{
 		if (stepsSinceLastGrounded > 1 || stepsSinceLastJump <= 2)
@@ -239,6 +263,7 @@ public class SmashCycle : MonoBehaviour
 		{
 			return false;
 		}
+		Debug.DrawLine(rb.position, rb.position - upAxis.normalized*probeDistance, Color.white);
 		if (!Physics.Raycast(
 			rb.position, -upAxis, out RaycastHit hit,
 			probeDistance, probeMask
@@ -276,15 +301,13 @@ public class SmashCycle : MonoBehaviour
 	}
 	private void BoostHold()
 	{
-		Debug.Log("Boost Hold called");
 		rb.AddForce(desiredVelocity.normalized * boostPower);
 	}
 
 	void Jump(Vector3 gravity)
 	{
-		Debug.Log("Jump called");
 		Vector3 jumpDirection;
-		if (onGround)
+		if (OnGround)
 		{
 			jumpDirection = contactNormal;
 		}
@@ -307,11 +330,13 @@ public class SmashCycle : MonoBehaviour
 	void OnCollisionEnter(Collision collision)
 	{
 		EvaluateCollision(collision);
+		Debug.Log("Collision Enter");
 	}
 
 	void OnCollisionExit(Collision collision)
 	{
 		EvaluateCollision(collision);
+		Debug.Log("Collision Exit");
 	}
 
 	void EvaluateCollision(Collision collision)
@@ -334,20 +359,8 @@ public class SmashCycle : MonoBehaviour
 		}
 	}
 
-	bool CheckSteepContacts()
+	Vector3 ProjectDirectionOnPlane(Vector3 direction, Vector3 normal)
 	{
-		if (steepContactCount > 1)
-		{
-			steepNormal.Normalize();
-			float upDot = Vector3.Dot(upAxis, steepNormal);
-			if (upDot >= minGroundDotProduct)
-			{
-				steepContactCount = 0;
-				groundContactCount = 1;
-				contactNormal = steepNormal;
-				return true;
-			}
-		}
-		return false;
+		return (direction - normal * Vector3.Dot(direction, normal)).normalized;
 	}
 }
