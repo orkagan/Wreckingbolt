@@ -122,22 +122,31 @@ public class SmashCycle : MonoBehaviour
         vehicleBody_tf.position = transform.position;
 
 		//Seat rotation
-		Quaternion lookDir = vehicleBody_tf.rotation;
+		//Quaternion lookDir = vehicleBody_tf.rotation;
+		Quaternion lookDir;
 		if (desiredVelocity.magnitude > 0.1f)
 		{
-			//TODO: replace Vector3.up with contact normal
 			lookDir = Quaternion.LookRotation(desiredVelocity, upAxis);
 		}
+        else
+        {
+			lookDir = Quaternion.LookRotation(vehicleBody_tf.forward, upAxis);
+		}
+		/*Vector3 tiltSide = Vector3.Cross(desiredVelocity.normalized, rb.velocity.normalized);
+        lookDir.eulerAngles = new Vector3(lookDir.eulerAngles.x, lookDir.eulerAngles.y, 60f * tiltSide.y);*/
 		Vector3 tiltSide = Vector3.Cross(desiredVelocity.normalized, rb.velocity.normalized);
-		lookDir.eulerAngles = new Vector3(lookDir.eulerAngles.x, lookDir.eulerAngles.y, 60f * tiltSide.y);
+		//lookDir.eulerAngles += tiltSide * 60f;
 
-		seat_tf.rotation = Quaternion.Lerp(seat_tf.rotation, lookDir, Time.deltaTime * 2f);
+        seat_tf.rotation = Quaternion.Lerp(seat_tf.rotation, lookDir, Time.deltaTime * 2f);
 
-		//Ball Tilt
+		//Ball/Wheel Tilt
         Vector3 ballTiltSide = Vector3.Cross(vehicleBody_tf.forward.normalized, rb.velocity.normalized);
         float ballTiltAmount = Vector3.Angle(vehicleBody_tf.forward.normalized, rb.velocity.normalized) * velocity.magnitude / 10f;
-		Quaternion ballTilt = Quaternion.Euler(tilt_tf.eulerAngles.x, 0, Mathf.Clamp(ballTiltAmount, 0f, 60f) * ballTiltSide.y);
-		tilt_tf.localRotation = Quaternion.Lerp(tilt_tf.localRotation, ballTilt, Time.deltaTime * 10f);
+		/*Quaternion ballTilt = Quaternion.Euler(tilt_tf.eulerAngles.x, 0, Mathf.Clamp(ballTiltAmount, 0f, 60f) * ballTiltSide.y);
+		tilt_tf.localRotation = Quaternion.Lerp(tilt_tf.localRotation, ballTilt, Time.deltaTime * 10f);*/
+		float ballTilt = Mathf.Clamp(ballTiltAmount, 0f, 60f) * ballTiltSide.y;
+		//tilt_tf.Rotate(Vector3.forward, ballTilt);
+		tilt_tf.localEulerAngles = new Vector3(0, 0, ballTilt);
 
 		//Wheel Roll
 		wheelRollSpeed = Mathf.Rad2Deg * Vector3.Dot(rb.angularVelocity, vehicleBody_tf.right.normalized);
@@ -337,6 +346,11 @@ public class SmashCycle : MonoBehaviour
 	{
 		EvaluateCollision(collision);
 		Debug.Log("Collision Exit");
+	}
+
+	void OnCollisionStay(Collision collision)
+	{
+		EvaluateCollision(collision);
 	}
 
 	void EvaluateCollision(Collision collision)
