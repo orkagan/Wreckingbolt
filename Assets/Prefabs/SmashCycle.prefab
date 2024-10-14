@@ -5302,14 +5302,14 @@ MonoBehaviour:
   maxAcceleration: 15
   frictionCoefficient: 0.03
   turnSpeed: 0.05
+  jumpHeight: 4
+  boostPower: 5000
   maxGroundAngle: 30
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 64
-  jumpHeight: 8
-  boostPower: 5000
   playerInputSpace: {fileID: 4845264250766932453}
   vehicleBody_tf: {fileID: 6084213820483535867}
   tilt_tf: {fileID: 3079738885164256514}
@@ -5508,6 +5508,7 @@ MonoBehaviour:
   maxVerticalAngle: 45
   alignDelay: 2
   alignSmoothRange: 45
+  upAlignmentSpeed: 360
   obstructionMask:
     serializedVersion: 2
     m_Bits: 64

@@ -12,6 +12,8 @@ public class SmashCycle : MonoBehaviour
 	[SerializeField] float maxAcceleration = 10f;
 	[SerializeField, Range(0,1)] float frictionCoefficient = 0.02f;
 	[SerializeField] float turnSpeed = 0.05f;
+	[SerializeField] float jumpHeight = 10f;
+	[SerializeField] float boostPower = 5000f;
 
 	[Header("Surface Contact")]
 	[SerializeField, Range(0, 90)]
@@ -23,8 +25,6 @@ public class SmashCycle : MonoBehaviour
 	[SerializeField]
 	LayerMask probeMask = -1;
 
-	[SerializeField] float jumpHeight = 10f;
-	[SerializeField] float boostPower = 5000f;
 	#endregion
 	#region References
 	[Header("References")]
@@ -121,32 +121,20 @@ public class SmashCycle : MonoBehaviour
         //Vehicle body copy position
         vehicleBody_tf.position = transform.position;
 
+		//Target look direction
+		Vector3 lookDir = (desiredVelocity.magnitude > 0.1f) ? desiredVelocity : vehicleBody_tf.forward;
 		//Seat rotation
-		//Quaternion lookDir = vehicleBody_tf.rotation;
-		Quaternion lookDir;
-		if (desiredVelocity.magnitude > 0.1f)
-		{
-			lookDir = Quaternion.LookRotation(desiredVelocity, upAxis);
-		}
-        else
-        {
-			lookDir = Quaternion.LookRotation(vehicleBody_tf.forward, upAxis);
-		}
-		/*Vector3 tiltSide = Vector3.Cross(desiredVelocity.normalized, rb.velocity.normalized);
-        lookDir.eulerAngles = new Vector3(lookDir.eulerAngles.x, lookDir.eulerAngles.y, 60f * tiltSide.y);*/
-		Vector3 tiltSide = Vector3.Cross(desiredVelocity.normalized, rb.velocity.normalized);
-		//lookDir.eulerAngles += tiltSide * 60f;
+		Quaternion lookTarget = Quaternion.LookRotation(lookDir, upAxis);
+		//Seat tilt
+		float seatTilt = Mathf.Clamp(-Vector3.SignedAngle(rb.velocity, desiredVelocity, upAxis),-60,60);
+		lookTarget *= Quaternion.Euler(0,0,seatTilt);
+		//Apply rotation with smoothing
+		seat_tf.rotation = Quaternion.Lerp(seat_tf.rotation, lookTarget, Time.deltaTime * 2f);
 
-        seat_tf.rotation = Quaternion.Lerp(seat_tf.rotation, lookDir, Time.deltaTime * 2f);
-
-		//Ball/Wheel Tilt
-        Vector3 ballTiltSide = Vector3.Cross(vehicleBody_tf.forward.normalized, rb.velocity.normalized);
-        float ballTiltAmount = Vector3.Angle(vehicleBody_tf.forward.normalized, rb.velocity.normalized) * velocity.magnitude / 10f;
-		/*Quaternion ballTilt = Quaternion.Euler(tilt_tf.eulerAngles.x, 0, Mathf.Clamp(ballTiltAmount, 0f, 60f) * ballTiltSide.y);
-		tilt_tf.localRotation = Quaternion.Lerp(tilt_tf.localRotation, ballTilt, Time.deltaTime * 10f);*/
-		float ballTilt = Mathf.Clamp(ballTiltAmount, 0f, 60f) * ballTiltSide.y;
-		//tilt_tf.Rotate(Vector3.forward, ballTilt);
-		tilt_tf.localEulerAngles = new Vector3(0, 0, ballTilt);
+		//Ball Tilt
+		float ballTiltSide = Mathf.Clamp(Vector3.SignedAngle(vehicleBody_tf.forward.normalized, rb.velocity.normalized, upAxis) / 90f, -1, 1);
+		float ballTiltAmount = (!OnGround) ? 0 : Mathf.Clamp(sideFriction.magnitude * 360f, 0f, 60f);
+		tilt_tf.localRotation = Quaternion.Lerp(tilt_tf.localRotation, Quaternion.Euler(0, 0, ballTiltAmount * ballTiltSide), Time.deltaTime * 4);
 
 		//Wheel Roll
 		wheelRollSpeed = Mathf.Rad2Deg * Vector3.Dot(rb.angularVelocity, vehicleBody_tf.right.normalized);
@@ -154,18 +142,17 @@ public class SmashCycle : MonoBehaviour
         #endregion
 
         //Debug vectors
-        //Debug.DrawLine(transform.position, transform.position + rb.angularVelocity, Color.yellow);
         Debug.DrawLine(transform.position, transform.position + desiredVelocity, Color.blue);
         Debug.DrawLine(transform.position, transform.position + sideFriction * 10f, Color.yellow);
-        //Debug.DrawLine(transform.position, transform.position + tiltSide, Color.green);
         Debug.DrawLine(transform.position, transform.position + rb.velocity, Color.red);
+        Debug.DrawLine(transform.position, transform.position + -upAxis, Color.magenta);
     }
 
 	private void FixedUpdate()
 	{
-		Vector3 gravity = CustomGravity.GetGravity(rb.position, out upAxis);
-		Debug.DrawLine(rb.position, rb.position + upAxis, Color.green);
 		//Vector3 gravity = Physics.gravity; upAxis = Vector3.up;
+		Vector3 gravity = CustomGravity.GetGravity(rb.position, out upAxis);
+		//Debug.DrawLine(rb.position, rb.position + upAxis, Color.magenta);
 		UpdateState();
 		AdjustVelocity();
 
@@ -234,15 +221,13 @@ public class SmashCycle : MonoBehaviour
 	{
 		float maxSpeedChange = maxAcceleration * Time.deltaTime;
 
-		//Debug.DrawLine(vehicleBody_tf.position, vehicleBody_tf.position + contactNormal, Color.green);
 		Quaternion lookTarget = Quaternion.LookRotation(vehicleBody_tf.forward, upAxis);
 		//0.1f is kinda hardcoded deadzone
 		if (desiredVelocity.magnitude > 0.1f)
 		{
 			//Turn to desired direction
-			//TODO: replace Vector3.up with contact normal
 			lookTarget = Quaternion.LookRotation(desiredVelocity, upAxis);
-			//float turnSpeed = turnSpeedCurve.Evaluate();
+			//float turnSpeed = turnSpeedCurve.Evaluate(); //TODO: reduce turning capabilities as speed increases
 		}
 		vehicleBody_tf.rotation = Quaternion.Lerp(vehicleBody_tf.rotation, lookTarget, turnSpeed);
 
