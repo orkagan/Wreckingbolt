@@ -5304,8 +5304,8 @@ MonoBehaviour:
   turnSpeed: 0.05
   jumpHeight: 4
   boostPower: 5000
-  maxGroundAngle: 30
-  maxSnapSpeed: 100
+  maxGroundAngle: 15
+  maxSnapSpeed: 82.1
   probeDistance: 1
   probeMask:
     serializedVersion: 2
@@ -5348,7 +5348,7 @@ MonoBehaviour:
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 3992793317436425270}
 --- !u!1 &3816179820547134928
 GameObject:
   m_ObjectHideFlags: 0
@@ -5416,7 +5416,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 1100
   field of view: 60
   orthographic: 0
   orthographic size: 5

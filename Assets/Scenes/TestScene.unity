@@ -540,7 +540,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 61cac4b23ccaea44cae977d7336c17bb,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.08
+      value: -0.07
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 61cac4b23ccaea44cae977d7336c17bb,
         type: 3}
@@ -659,6 +659,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 91d0eb90421074e40a849bb9933635a9,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 72c936feae16774488e37814858c4c03, type: 2}
     - target: {fileID: -4283972540087228153, guid: 91d0eb90421074e40a849bb9933635a9,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1059,8 +1064,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gravity: 9.81
   innerFalloffRadius: 1
-  innerRadius: 5
-  outerRadius: 73.4
+  innerRadius: 28.3
+  outerRadius: 124.4
   outerFalloffRadius: 144
 --- !u!1 &566438879 stripped
 GameObject:
@@ -1529,12 +1534,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!20 &799289542 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 3992793317436425270, guid: 06c7870e30d916a46a3e364555171e7e,
-    type: 3}
-  m_PrefabInstance: {fileID: 8990472993108255813}
-  m_PrefabAsset: {fileID: 0}
 --- !u!54 &832179362 stripped
 Rigidbody:
   m_CorrespondingSourceObject: {fileID: 7954557516404530509, guid: 06c7870e30d916a46a3e364555171e7e,
@@ -3206,6 +3205,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: d785a5e84e77a7d4789ae2caf4bad0dc,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 72c936feae16774488e37814858c4c03, type: 2}
     - target: {fileID: 919132149155446097, guid: d785a5e84e77a7d4789ae2caf4bad0dc,
         type: 3}
       propertyPath: m_Name
@@ -3883,25 +3887,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 267193551740860624, guid: 06c7870e30d916a46a3e364555171e7e,
-        type: 3}
-      propertyPath: m_Camera
-      value: 
-      objectReference: {fileID: 799289542}
     - target: {fileID: 2728074471053841274, guid: 06c7870e30d916a46a3e364555171e7e,
         type: 3}
       propertyPath: m_Name
       value: SmashCycle
-      objectReference: {fileID: 0}
-    - target: {fileID: 3992793317436425270, guid: 06c7870e30d916a46a3e364555171e7e,
-        type: 3}
-      propertyPath: far clip plane
-      value: 1100
-      objectReference: {fileID: 0}
-    - target: {fileID: 5308683917365148432, guid: 06c7870e30d916a46a3e364555171e7e,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6879654098199474325, guid: 06c7870e30d916a46a3e364555171e7e,
         type: 3}
@@ -3952,11 +3941,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8096538319548195335, guid: 06c7870e30d916a46a3e364555171e7e,
-        type: 3}
-      propertyPath: jumpHeight
-      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -152,6 +152,8 @@ public class SmashCycle : MonoBehaviour
 	{
 		//Vector3 gravity = Physics.gravity; upAxis = Vector3.up;
 		Vector3 gravity = CustomGravity.GetGravity(rb.position, out upAxis);
+		if (gravity == Vector3.zero) upAxis = playerInputSpace.up;
+		Debug.Log($"Gravity: {gravity}\nUpAxis: {upAxis}");
 		//Debug.DrawLine(rb.position, rb.position + upAxis, Color.magenta);
 		UpdateState();
 		AdjustVelocity();
@@ -177,7 +179,7 @@ public class SmashCycle : MonoBehaviour
 		velocity += gravity * Time.deltaTime;
 
 		rb.velocity = velocity;
-		Debug.Log($"OnGround: {OnGround}");
+		//Debug.Log($"OnGround: {OnGround}");
 		ClearState();
 	}
 	
@@ -221,14 +223,21 @@ public class SmashCycle : MonoBehaviour
 	{
 		float maxSpeedChange = maxAcceleration * Time.deltaTime;
 
+		//Direction Vehicle is facing
 		Quaternion lookTarget = Quaternion.LookRotation(vehicleBody_tf.forward, upAxis);
-		//0.1f is kinda hardcoded deadzone
+		Vector3 upDir = OnGround ? contactNormal : upAxis;
+		//(0.1f is kinda hardcoded deadzone)
 		if (desiredVelocity.magnitude > 0.1f)
 		{
 			//Turn to desired direction
-			lookTarget = Quaternion.LookRotation(desiredVelocity, upAxis);
+			lookTarget = Quaternion.LookRotation(desiredVelocity, upDir);
 			//float turnSpeed = turnSpeedCurve.Evaluate(); //TODO: reduce turning capabilities as speed increases
 		}
+		else
+		{
+			lookTarget = Quaternion.LookRotation(ProjectDirectionOnPlane(vehicleBody_tf.forward,upDir),upDir);
+		}
+		Debug.DrawLine(transform.position, transform.position+lookTarget * Vector3.forward * 3);
 		vehicleBody_tf.rotation = Quaternion.Lerp(vehicleBody_tf.rotation, lookTarget, turnSpeed);
 
 
@@ -238,6 +247,10 @@ public class SmashCycle : MonoBehaviour
 			//TODO: make friction asymptotic curve
 			sideFriction = Vector3.Dot(velocity, vehicleBody_tf.right.normalized) * -frictionCoefficient * vehicleBody_tf.right.normalized;
 			velocity += sideFriction;
+		}
+		else
+		{
+			sideFriction = Vector3.zero;
 		}
 
 		//Appply forces
@@ -324,13 +337,13 @@ public class SmashCycle : MonoBehaviour
 	void OnCollisionEnter(Collision collision)
 	{
 		EvaluateCollision(collision);
-		Debug.Log("Collision Enter");
+		//Debug.Log("Collision Enter");
 	}
 
 	void OnCollisionExit(Collision collision)
 	{
 		EvaluateCollision(collision);
-		Debug.Log("Collision Exit");
+		//Debug.Log("Collision Exit");
 	}
 
 	void OnCollisionStay(Collision collision)
