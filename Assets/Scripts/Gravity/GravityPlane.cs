@@ -13,7 +13,14 @@ public class GravityPlane : GravitySource
 	{
 		Vector3 up = transform.up;
 		float distance = Vector3.Dot(up, position - transform.position);
-		if (distance > range || distance < 0)
+		float xRange = Vector3.Dot(transform.right, position - transform.position);
+		float zRange = Vector3.Dot(transform.forward, position - transform.position);
+		if (distance > range ||
+			distance < 0 ||
+			xRange < -transform.localScale.x/2 ||
+			xRange > transform.localScale.x / 2 ||
+			zRange < -transform.localScale.z / 2 ||
+			zRange > transform.localScale.z / 2)
 		{
 			return Vector3.zero;
 		}

@@ -14,7 +14,7 @@ public class Timer : MonoBehaviour
     }
     private void Update()
     {
-        if (GameManager.Instance.gameState == GameState.Playing)
+        if (GameManager.Instance.CurrentGameState == GameState.Playing)
         {
             time += Time.deltaTime; //time where 1 = 1 second
 

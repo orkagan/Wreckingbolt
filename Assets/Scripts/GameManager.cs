@@ -1,102 +1,123 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 public enum GameState
 {
-    Menu,
+    MainMenu,
+    LevelSelect,
+    Options,
     Playing,
+    Paused,
+    Win
 }
-
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
-    #region Singleton Setup
-    //Staticly typed property setup for EnemySpawner.Instance
-    private static GameManager _instance;
-    public static GameManager Instance
+    [SerializeField]
+    private GameState gameState = GameState.Playing;
+    public GameState CurrentGameState
     {
-        get => _instance;
-        private set
+        get
         {
-            //check if instance of this class already exists and if so keep orignal existing instance
-            if (_instance == null)
-            {
-                _instance = value;
-            }
-            else if (_instance != value)
-            {
-                Debug.Log($"{nameof(GameManager)} instance already exists, destroy the duplicate!");
-                Destroy(value);
-            }
+            return gameState;
+        }
+        set
+        {
+            gameState = value;
+            SwitchPanels(gameState);
         }
     }
-    private void Awake()
+    //public Dictionary<GameState, GameObject> panels;
+    [Serializable]
+    public struct Element
     {
-        Instance = this; //sets the static class instance
+        public GameState panelState;
+        public GameObject panelGameObj;
+        public bool pauses;
     }
-    #endregion
+    /// <summary>
+    /// Stores the UI panel associated with a state and if it should pause the game.
+    /// </summary>
+    public Element[] elements;
 
-    public GameState gameState;
-
-    void Start()
+    private void Start()
     {
-        UpdateGameState();
+        SwitchPanels(CurrentGameState);
     }
-
     void Update()
     {
-		if (Input.GetKeyDown(KeyCode.R))
-		{
-            Retry();
-		}
+        /*if (Input.GetButtonDown("Pause"))
+        {
+            if (CurrentGameState == GameState.Playing)
+            {
+                CurrentGameState = GameState.Paused;
+            }
+            else if (CurrentGameState == GameState.Paused)
+            {
+                CurrentGameState = GameState.Playing;
+            }
+        }*/
     }
 
-    public void UpdateGameState()
-	{
-        switch (gameState)
+    public void Win()
+    {
+        CurrentGameState = GameState.Win;
+    }
+    public void SwitchPanels(GameState state)
+    {
+        foreach (Element item in elements)
         {
-            case GameState.Menu:
-                if (Cursor.visible == false)
-                {
-                    Cursor.visible = true;
-                    Cursor.lockState = CursorLockMode.None;
-                }
-                break;
-            case GameState.Playing:
-                if (Cursor.visible == true)
-                {
-                    Cursor.visible = false;
-                    Cursor.lockState = CursorLockMode.Locked;
-                }
-                break;
-            default:
-                break;
+            if (item.panelState == CurrentGameState)
+            {
+                //Enable panel of current state
+                item.panelGameObj.SetActive(true);
+                Time.timeScale = item.pauses ? 0 : 1;
+            }
+            else
+            {
+                //Disable other panels
+                item.panelGameObj.SetActive(false);
+            }
         }
     }
+    public void ChangeGameState(string targetState)
+    {
+        CurrentGameState = (GameState)System.Enum.Parse(typeof(GameState), targetState);
+    }
 
-    public void NextScene()
+    public void ChangeGameState(GameState gameState)
+    {
+        CurrentGameState = gameState;
+    }
+
+    public static void NextScene()
     {
         // Get the current scene
         Scene currentScene = SceneManager.GetActiveScene();
-        // Load the next scene after the current scene (or loop back around to 1st)
+        // Load the next scene after the current scene (last scene loops back around to first)
         SceneManager.LoadScene((currentScene.buildIndex + 1) % SceneManager.sceneCountInBuildSettings);
     }
 
-    public void Retry()
+    public static void LoadScene(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
+    }
+
+    public static void Retry()
     {
         //reloads current scene
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    public void ExitGame()
+
+    public static void ExitGame()
     {
-        //quits application
         Application.Quit();
-        //or if running in editor then stop play mode
 #if UNITY_EDITOR
-        Debug.Log("ExitGame attempted.");
+        Debug.Log("ExitGame called.");
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
     }
