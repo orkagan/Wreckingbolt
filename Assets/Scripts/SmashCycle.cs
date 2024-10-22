@@ -164,13 +164,13 @@ public class SmashCycle : MonoBehaviour
 		{
 			BoostHold();
 			jetThrustFX.Play();
-        }
-        else
-        {
+		}
+		else
+		{
 			jetThrustFX.Stop();
-        }
+		}
 
-        if (desiredJump)
+		if (desiredJump)
         {
 			desiredJump = false;
 			Jump(gravity);

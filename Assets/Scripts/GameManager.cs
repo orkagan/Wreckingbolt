@@ -49,18 +49,24 @@ public class GameManager : Singleton<GameManager>
     }
     void Update()
     {
-        /*if (Input.GetButtonDown("Pause"))
-        {
-            if (CurrentGameState == GameState.Playing)
-            {
-                CurrentGameState = GameState.Paused;
-            }
-            else if (CurrentGameState == GameState.Paused)
-            {
-                CurrentGameState = GameState.Playing;
-            }
-        }*/
-    }
+		//Placeholder Controls
+        if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			if (CurrentGameState == GameState.Playing)
+			{
+				CurrentGameState = GameState.Paused;
+			}
+			else if (CurrentGameState == GameState.Paused)
+			{
+				CurrentGameState = GameState.Playing;
+			}
+		}
+		if (Input.GetKeyDown(KeyCode.R))
+		{
+            Debug.Log("Retry");
+            Retry();
+		}
+	}
 
     public void Win()
     {
@@ -68,20 +74,19 @@ public class GameManager : Singleton<GameManager>
     }
     public void SwitchPanels(GameState state)
     {
+        GameObject currentPanel = null;
         foreach (Element item in elements)
         {
+            //Disable other panels
+            item.panelGameObj.SetActive(false);
             if (item.panelState == CurrentGameState)
             {
-                //Enable panel of current state
-                item.panelGameObj.SetActive(true);
+                currentPanel = item.panelGameObj;
                 Time.timeScale = item.pauses ? 0 : 1;
             }
-            else
-            {
-                //Disable other panels
-                item.panelGameObj.SetActive(false);
-            }
         }
+        //Enable panel of current state
+        currentPanel.SetActive(true);
     }
     public void ChangeGameState(string targetState)
     {

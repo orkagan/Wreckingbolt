@@ -5417,7 +5417,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1100
-  field of view: 60
+  field of view: 75
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -5500,7 +5500,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   focus: {fileID: 8385120388563151731}
-  distance: 5
+  distance: 4
   focusRadius: 0
   focusCentering: 0.5
   rotationSpeed: 90

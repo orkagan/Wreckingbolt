@@ -92,6 +92,8 @@ public class OrbitCamera : MonoBehaviour
 
 	void LateUpdate()
 	{
+		if (Time.timeScale == 0) return;
+
 		UpdateGravityAlignment();
 		UpdateFocusPoint();
 		if (ManualRotation() || AutomaticRotation())

@@ -1357,6 +1357,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9.81
+  falloff: 0
   range: 30
 --- !u!1 &610147159
 GameObject:
@@ -2068,6 +2069,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9.81
+  falloff: 1
   range: 24
 --- !u!4 &934524413
 Transform:
@@ -2325,6 +2327,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9.81
+  falloff: 0
   range: 80.5
 --- !u!4 &982916873
 Transform:
@@ -3360,6 +3363,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9.81
+  falloff: 0
   range: 30
 --- !u!1 &1397627087
 GameObject:
@@ -3406,6 +3410,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9.81
+  falloff: 0
   range: 30
 --- !u!1 &1488483010
 GameObject:
@@ -4248,6 +4253,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9.81
+  falloff: 0
   range: 30
 --- !u!1 &2012518394
 GameObject:
@@ -4279,6 +4285,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9.81
+  falloff: 1
   range: 30
 --- !u!4 &2012518396
 Transform:

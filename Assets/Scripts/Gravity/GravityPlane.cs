@@ -5,9 +5,12 @@ public class GravityPlane : GravitySource
 
 	[SerializeField]
 	float gravity = 9.81f;
+	[SerializeField]
+	bool falloff = false;
 
 	[SerializeField, Min(0f)]
 	float range = 1f;
+
 
 	public override Vector3 GetGravity(Vector3 position)
 	{
@@ -25,7 +28,7 @@ public class GravityPlane : GravitySource
 			return Vector3.zero;
 		}
 		float g = -gravity;
-		if (distance > 0f)
+		if (falloff & distance > 0f)
 		{
 			g *= 1f - distance / range;
 		}
