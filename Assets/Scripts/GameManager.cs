@@ -16,6 +16,7 @@ public enum GameState
 }
 public class GameManager : Singleton<GameManager>
 {
+    public event Action<GameState> OnGameStateChanged;
     [SerializeField]
     private GameState gameState = GameState.Playing;
     public GameState CurrentGameState
@@ -27,25 +28,13 @@ public class GameManager : Singleton<GameManager>
         set
         {
             gameState = value;
-            SwitchPanels(gameState);
+            OnGameStateChanged?.Invoke(CurrentGameState);
         }
     }
-    //public Dictionary<GameState, GameObject> panels;
-    [Serializable]
-    public struct Element
-    {
-        public GameState panelState;
-        public GameObject panelGameObj;
-        public bool pauses;
-    }
-    /// <summary>
-    /// Stores the UI panel associated with a state and if it should pause the game.
-    /// </summary>
-    public Element[] elements;
 
     private void Start()
     {
-        SwitchPanels(CurrentGameState);
+        
     }
     void Update()
     {
@@ -71,22 +60,6 @@ public class GameManager : Singleton<GameManager>
     public void Win()
     {
         CurrentGameState = GameState.Win;
-    }
-    public void SwitchPanels(GameState state)
-    {
-        GameObject currentPanel = null;
-        foreach (Element item in elements)
-        {
-            //Disable other panels
-            item.panelGameObj.SetActive(false);
-            if (item.panelState == CurrentGameState)
-            {
-                currentPanel = item.panelGameObj;
-                Time.timeScale = item.pauses ? 0 : 1;
-            }
-        }
-        //Enable panel of current state
-        currentPanel.SetActive(true);
     }
     public void ChangeGameState(string targetState)
     {
