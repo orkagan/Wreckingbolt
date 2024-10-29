@@ -16,13 +16,10 @@ public class MenuHandler : Singleton<MenuHandler>
     /// Stores the UI panel associated with a state and if it should pause the game.
     /// </summary>
     [SerializeField] Element[] elements;
-	// Start is called before the first frame update
-	private void Awake()
-	{
-        GameManager.Instance.OnGameStateChanged += SwitchPanels;
-	}
+
 	private void Start()
 	{
+        GameManager.Instance.OnGameStateChanged += SwitchPanels;
         SwitchPanels(GameManager.Instance.CurrentGameState);
 	}
 

@@ -6,7 +6,7 @@ public class GravityPlane : GravitySource
 	[SerializeField]
 	float gravity = 9.81f;
 	[SerializeField]
-	bool falloff = false;
+	bool falloff = true;
 
 	[SerializeField, Min(0f)]
 	float range = 1f;

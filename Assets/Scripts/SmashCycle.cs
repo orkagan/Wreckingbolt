@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +14,22 @@ public class SmashCycle : MonoBehaviour
 	[SerializeField, Range(0,1)] float frictionCoefficient = 0.02f;
 	[SerializeField] float turnSpeed = 0.05f;
 	[SerializeField] float jumpHeight = 10f;
+
 	[SerializeField] float boostPower = 5000f;
+	[SerializeField] float boostMaxAmount = 10f; //burns 1 a second
+	[SerializeField] float boostRechargeRate = 1f;
+	[SerializeField] float boostRechargeDelay = 1f;
+	public float BoostMaxAmount
+	{
+		get
+		{
+			return boostMaxAmount;
+		}
+		private set
+		{
+			boostMaxAmount = value;
+		}
+	}
 
 	[Header("Surface Contact")]
 	[SerializeField, Range(0, 90)]
@@ -26,9 +42,11 @@ public class SmashCycle : MonoBehaviour
 	LayerMask probeMask = -1;
 
 	#endregion
+
 	#region References
 	[Header("References")]
 	[SerializeField] Transform playerInputSpace = default;
+	[SerializeField] PlayerInputHandler controls;
 	public Transform vehicleBody_tf;
 	public Transform tilt_tf;
 	public Transform wheel_tf;
@@ -37,7 +55,9 @@ public class SmashCycle : MonoBehaviour
 
 	Rigidbody rb;
 	#endregion
+
 	#region Internal Variables
+	float boostRechargeTime;
 	Vector2 playerInputMove;
 	Vector3 desiredVelocity;
 	Vector3 sideFriction;
@@ -53,35 +73,22 @@ public class SmashCycle : MonoBehaviour
 	int stepsSinceLastJump, stepsSinceLastGrounded;
 	float minGroundDotProduct;
 	Vector3 contactNormal, steepNormal;
-	#endregion
-	#region Controls/Inputs
-	PlayerInputActions playerControls;
-	private InputAction move, jump, boost;
-
-	private void Awake()
+	
+	bool desiredBoost;
+	public event Action<float> OnBoostChanged;
+	[SerializeField]
+	float boostAmount;
+	public float BoostAmount
 	{
-		playerControls = new PlayerInputActions();
-		OnValidate();
-	}
-
-	private void OnEnable()
-	{
-		move = playerControls.Player.Move;
-		move.Enable();
-
-		jump = playerControls.Player.Jump;
-		jump.Enable();
-
-		boost = playerControls.Player.Boost;
-		boost.Enable();
-		//boost.performed += BoostBurst;
-	}
-
-	private void OnDisable()
-	{
-		move.Disable();
-		jump.Disable();
-		boost.Disable();
+		get
+		{
+			return boostAmount;
+		}
+		private set
+		{
+			boostAmount = value;
+			OnBoostChanged?.Invoke(BoostAmount);
+		}
 	}
 	#endregion
 
@@ -91,17 +98,25 @@ public class SmashCycle : MonoBehaviour
 		rb.maxAngularVelocity = maxAngularVelocity;
 		rb.useGravity = false;
 
+		controls = GetComponent<PlayerInputHandler>();
+
 		minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
+	}
+	private void Awake()
+	{
+		OnValidate();
 	}
 	private void Start()
     {
-		
-    }
+		BoostAmount = BoostMaxAmount;
+		boostRechargeTime = 0;
+		jetThrustFX.Stop();
+	}
 
     private void Update()
     {
 		//Get player move input
-		playerInputMove = Vector2.ClampMagnitude(move.ReadValue<Vector2>(), 1f);
+		playerInputMove = Vector2.ClampMagnitude(controls.move.ReadValue<Vector2>(), 1f);
 		//Convert input to camera space, else world space
 		if (playerInputSpace)
 		{
@@ -115,19 +130,20 @@ public class SmashCycle : MonoBehaviour
 		}
 		desiredVelocity = (rightAxis* playerInputMove.x + forwardAxis * playerInputMove.y) * maxSpeed;
 
-		desiredJump |= jump.WasPressedThisFrame();
+		desiredJump |= controls.jump.WasPressedThisFrame();
+		desiredBoost |= controls.boost.IsPressed();
 
-        #region Visuals using external transforms
-        //Vehicle body copy position
-        vehicleBody_tf.position = transform.position;
+		#region Visuals using exterrnal transforms
+		//Vehicle body copy position
+		vehicleBody_tf.position = transform.position;
 
 		//Target look direction
 		Vector3 lookDir = (desiredVelocity.magnitude > 0.1f) ? desiredVelocity : vehicleBody_tf.forward;
 		//Seat rotation
 		Quaternion lookTarget = Quaternion.LookRotation(lookDir, upAxis);
 		//Seat tilt
-		float seatTilt = Mathf.Clamp(-Vector3.SignedAngle(rb.velocity, desiredVelocity, upAxis),-60,60);
-		lookTarget *= Quaternion.Euler(0,0,seatTilt);
+		float seatTilt = Mathf.Clamp(-Vector3.SignedAngle(rb.velocity, desiredVelocity, upAxis), -60, 60);
+		lookTarget *= Quaternion.Euler(0, 0, seatTilt);
 		//Apply rotation with smoothing
 		seat_tf.rotation = Quaternion.Lerp(seat_tf.rotation, lookTarget, Time.deltaTime * 2f);
 
@@ -139,10 +155,10 @@ public class SmashCycle : MonoBehaviour
 		//Wheel Roll
 		wheelRollSpeed = Mathf.Rad2Deg * Vector3.Dot(rb.angularVelocity, vehicleBody_tf.right.normalized);
 		wheel_tf.Rotate(Vector3.right, wheelRollSpeed * Time.deltaTime);
-        #endregion
+		#endregion
 
-        //Debug vectors
-        Debug.DrawLine(transform.position, transform.position + desiredVelocity, Color.blue);
+		//Debug vectors
+		Debug.DrawLine(transform.position, transform.position + desiredVelocity, Color.blue);
         Debug.DrawLine(transform.position, transform.position + sideFriction * 10f, Color.yellow);
         Debug.DrawLine(transform.position, transform.position + rb.velocity, Color.red);
         Debug.DrawLine(transform.position, transform.position + -upAxis, Color.magenta);
@@ -153,28 +169,28 @@ public class SmashCycle : MonoBehaviour
 		//Vector3 gravity = Physics.gravity; upAxis = Vector3.up;
 		Vector3 gravity = CustomGravity.GetGravity(rb.position, out upAxis);
 		if (gravity == Vector3.zero) upAxis = playerInputSpace.up;
-		Debug.Log($"Gravity: {gravity}\nUpAxis: {upAxis}");
+		//Debug.Log($"Gravity: {gravity}\nUpAxis: {upAxis}");
 		//Debug.DrawLine(rb.position, rb.position + upAxis, Color.magenta);
 		UpdateState();
 		AdjustVelocity();
 
 		//Boost
 		//if (Gamepad.current.rightShoulder.IsPressed())
-		if (boost.IsPressed())
+		/*if (boost.IsPressed())
 		{
 			BoostHold();
-			jetThrustFX.Play();
 		}
 		else
 		{
 			jetThrustFX.Stop();
-		}
+		}*/
 
 		if (desiredJump)
         {
 			desiredJump = false;
 			Jump(gravity);
         }
+		Boost();
 
 		velocity += gravity * Time.deltaTime;
 
@@ -301,14 +317,33 @@ public class SmashCycle : MonoBehaviour
 		contactNormal = steepNormal = Vector3.zero;
 	}
 
-	private void BoostBurst(InputAction.CallbackContext context)
+	/*private void BoostBurst(InputAction.CallbackContext context)
 	{
 		Debug.Log("Boost Burst called");
 		rb.AddForce(desiredVelocity.normalized * 200f * boostPower);
-	}
-	private void BoostHold()
+	}*/
+	private void Boost()
 	{
-		rb.AddForce(desiredVelocity.normalized * boostPower);
+		if (controls.boost.IsPressed() & BoostAmount > 0)
+		{
+			jetThrustFX.Play();
+			rb.AddForce(desiredVelocity.normalized * boostPower);
+			BoostAmount -= 1f * Time.deltaTime;
+			boostRechargeTime = boostRechargeDelay;
+		}
+		else
+		{
+			jetThrustFX.Stop();
+		}
+
+		if (boostRechargeTime <= 0 & BoostAmount<BoostMaxAmount)
+		{
+			BoostAmount += boostRechargeRate * Time.deltaTime;
+		}
+		else
+		{
+			boostRechargeTime -= Time.deltaTime;
+		}
 	}
 
 	void Jump(Vector3 gravity)
