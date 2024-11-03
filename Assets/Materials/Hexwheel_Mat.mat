@@ -51,8 +51,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Hexagon_Gap: 0.993
-    - _Hexagon_Scale_Size: 15
+    - _Hexagon_Gap: 0.996
+    - _Hexagon_Scale_Size: 13
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Smoothness: 0.139

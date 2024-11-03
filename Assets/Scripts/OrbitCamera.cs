@@ -8,6 +8,9 @@ public class OrbitCamera : MonoBehaviour
 	[SerializeField]
 	Transform focus = default;
 
+	[SerializeField]
+	float heightOffset = 1;
+
 	[SerializeField, Range(1f, 20f)]
 	float distance = 5f;
 
@@ -37,7 +40,7 @@ public class OrbitCamera : MonoBehaviour
 
 	Camera regularCamera;
 
-	Vector3 focusPoint, previousFocusPoint;
+	Vector3 focusPoint, previousFocusPoint, toUp;
 
 	Vector2 orbitAngles = new Vector2(45f, 0f);
 
@@ -121,14 +124,14 @@ public class OrbitCamera : MonoBehaviour
 			rectPosition = castFrom + castDirection * hit.distance;
 			lookPosition = rectPosition - rectOffset;
 		}
-
+		
 		transform.SetPositionAndRotation(lookPosition, lookRotation);
 	}
 
 	void UpdateGravityAlignment()
 	{
 		Vector3 fromUp = gravityAlignment * Vector3.up;
-		Vector3 toUp = CustomGravity.GetUpAxis(focusPoint);
+		toUp = CustomGravity.GetUpAxis(focusPoint);
 		float dot = Mathf.Clamp(Vector3.Dot(fromUp, toUp), -1f, 1f);
 		float angle = Mathf.Acos(dot) * Mathf.Rad2Deg;
 		float maxAngle = upAlignmentSpeed * Time.deltaTime;
@@ -150,7 +153,7 @@ public class OrbitCamera : MonoBehaviour
 	void UpdateFocusPoint()
 	{
 		previousFocusPoint = focusPoint;
-		Vector3 targetPoint = focus.position;
+		Vector3 targetPoint = focus.position + focus.up * heightOffset;
 		if (focusRadius > 0f)
 		{
 			float distance = Vector3.Distance(targetPoint, focusPoint);
