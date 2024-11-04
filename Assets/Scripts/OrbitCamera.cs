@@ -40,13 +40,13 @@ public class OrbitCamera : MonoBehaviour
 
 	Camera regularCamera;
 
-	Vector3 focusPoint, previousFocusPoint, toUp;
+	Vector3 focusPoint, previousFocusPoint;
 
 	Vector2 orbitAngles = new Vector2(45f, 0f);
 
 	float lastManualRotationTime;
 
-	Quaternion gravityAlignment = Quaternion.identity;
+	public Quaternion gravityAlignment = Quaternion.identity;
 
 	Quaternion orbitRotation;
 
@@ -131,7 +131,7 @@ public class OrbitCamera : MonoBehaviour
 	void UpdateGravityAlignment()
 	{
 		Vector3 fromUp = gravityAlignment * Vector3.up;
-		toUp = CustomGravity.GetUpAxis(focusPoint);
+		Vector3 toUp = CustomGravity.GetUpAxis(focusPoint);
 		float dot = Mathf.Clamp(Vector3.Dot(fromUp, toUp), -1f, 1f);
 		float angle = Mathf.Acos(dot) * Mathf.Rad2Deg;
 		float maxAngle = upAlignmentSpeed * Time.deltaTime;
@@ -153,7 +153,7 @@ public class OrbitCamera : MonoBehaviour
 	void UpdateFocusPoint()
 	{
 		previousFocusPoint = focusPoint;
-		Vector3 targetPoint = focus.position + focus.up * heightOffset;
+		Vector3 targetPoint = focus.position + (gravityAlignment * Vector3.up * heightOffset);
 		if (focusRadius > 0f)
 		{
 			float distance = Vector3.Distance(targetPoint, focusPoint);

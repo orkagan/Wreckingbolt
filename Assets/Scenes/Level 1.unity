@@ -1871,7 +1871,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &522479587
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1943,11 +1943,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2db16f34a636c7e47bedb73d061a21aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 137630672}
-  scriptRef: {fileID: 0}
-  movingTarget: {fileID: 0}
+  canvas_tf: {fileID: 0}
+  camera_tf: {fileID: 0}
+  player_tf: {fileID: 1498939342}
   speedometer: {fileID: 1924987344}
   boostBar: {fileID: 298021119}
+  HUDHeightOffset: 0.25
   speed: 0
 --- !u!1001 &579311316
 PrefabInstance:
@@ -11275,6 +11276,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1159971759}
   m_CullTransparentMesh: 1
+--- !u!1 &1162413517 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2154491067259408797, guid: 06c7870e30d916a46a3e364555171e7e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1882125362}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1183832062
 GameObject:
   m_ObjectHideFlags: 0
@@ -15210,6 +15217,12 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
+--- !u!4 &1498939342 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8385120388563151731, guid: 06c7870e30d916a46a3e364555171e7e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1882125362}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1509064206
 GameObject:
   m_ObjectHideFlags: 0
@@ -15981,6 +15994,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2154491067259408797, guid: 06c7870e30d916a46a3e364555171e7e,
+        type: 3}
+      propertyPath: m_Name
+      value: HUD Canvas
+      objectReference: {fileID: 0}
     - target: {fileID: 2728074471053841274, guid: 06c7870e30d916a46a3e364555171e7e,
         type: 3}
       propertyPath: m_Name
@@ -16230,10 +16248,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   elements:
   - panelState: 3
-    panelGameObj: {fileID: 522479586}
+    panelGameObj: {fileID: 1162413517}
     pauses: 0
   - panelState: 5
-    panelGameObj: {fileID: 522479586}
+    panelGameObj: {fileID: 1162413517}
     pauses: 1
   - panelState: 4
     panelGameObj: {fileID: 1159971759}
