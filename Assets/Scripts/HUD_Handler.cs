@@ -9,46 +9,46 @@ public class HUD_Handler : MonoBehaviour
     public RectTransform canvas_tf;
     public Transform camera_tf;
     public Transform player_tf;
+    public Transform speedometer_tf;
+    public Transform timer_tf;
     
-    private SmashCycle player_script;
     private OrbitCamera camera_script;
-    private Rigidbody movingTarget;
+    private SmashCycle player_script;
 
-    public TMP_Text speedometer;
     public Image boostBar;
 
     [SerializeField] float HUDHeightOffset = 0.5f;
-    [SerializeField] float speed;
+    
+    Vector3 upAxis;
 
 	private void Start()
 	{
-        movingTarget = player_tf.GetComponent<Rigidbody>();
         player_script = player_tf.GetComponent<SmashCycle>();
         camera_script = camera_tf.GetComponent<OrbitCamera>();
+
         player_script.OnBoostChanged += UpdateBoostBar;
-	}
+    }
 
     void Update()
     {
-        if (movingTarget == null)
-        {
-            speedometer.text = "KPH\n0";
-            return;
-        }
-        speed = movingTarget.velocity.magnitude;
-        speedometer.text = $"KPH\n{Mathf.Floor(speed * 3.6f)}";
+        upAxis = camera_script.gravityAlignment * Vector3.up;
 
+        canvas_tf.position = player_tf.position - upAxis * HUDHeightOffset;
+        canvas_tf.rotation = Quaternion.LookRotation(-upAxis, canvas_tf.position - camera_tf.position);
 
-        Vector3 toUp = camera_script.gravityAlignment * Vector3.up;
+        /*speedometer.transform.rotation = Quaternion.LookRotation(speedometer.transform.position - camera_tf.position, upAxis);
+        timer_tf.rotation = Quaternion.LookRotation(timer_tf.position - camera_tf.position, upAxis);*/
+        LookAtCamera(speedometer_tf);
+        LookAtCamera(timer_tf);
+    }
 
-        canvas_tf.position = player_tf.position - toUp * HUDHeightOffset;
-        canvas_tf.rotation = Quaternion.LookRotation(-toUp, canvas_tf.position - camera_tf.position);
-
-        speedometer.transform.rotation = Quaternion.LookRotation(speedometer.transform.position - camera_tf.position, toUp);
+    void LookAtCamera(Transform tf)
+	{
+        tf.rotation = Quaternion.LookRotation(tf.position - camera_tf.position, upAxis);
     }
 
     void UpdateBoostBar(float boostAmt)
-	{
+    {
         boostBar.fillAmount = boostAmt / player_script.BoostMaxAmount;
-	}
+    }
 }

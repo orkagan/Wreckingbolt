@@ -1030,7 +1030,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &372804544
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1946,10 +1946,10 @@ MonoBehaviour:
   canvas_tf: {fileID: 0}
   camera_tf: {fileID: 0}
   player_tf: {fileID: 1498939342}
-  speedometer: {fileID: 1924987344}
+  speedometer_tf: {fileID: 0}
+  timer_tf: {fileID: 0}
   boostBar: {fileID: 298021119}
   HUDHeightOffset: 0.25
-  speed: 0
 --- !u!1001 &579311316
 PrefabInstance:
   m_ObjectHideFlags: 0
