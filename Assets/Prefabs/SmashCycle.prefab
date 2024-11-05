@@ -243,7 +243,7 @@ GameObject:
   - component: {fileID: 5134467142766738559}
   - component: {fileID: 3094598903982941812}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: HUD Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5357,6 +5357,7 @@ GameObject:
   - component: {fileID: 7490099236545965003}
   - component: {fileID: 7954557516404530509}
   - component: {fileID: 8096538319548195335}
+  - component: {fileID: 4858440571922573605}
   - component: {fileID: 267193551740860624}
   m_Layer: 8
   m_Name: RigidbodySphere
@@ -5450,7 +5451,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 0.49
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &7954557516404530509
 Rigidbody:
@@ -5498,7 +5499,7 @@ MonoBehaviour:
   turnSpeed: 0.05
   jumpHeight: 4
   boostPower: 5000
-  boostMaxAmount: 10
+  boostMaxAmount: 3
   boostRechargeRate: 1
   boostRechargeDelay: 1
   maxGroundAngle: 15
@@ -5508,7 +5509,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   playerInputSpace: {fileID: 4845264250766932453}
-  controls: {fileID: 0}
+  controls: {fileID: 4858440571922573605}
   vehicleBody_tf: {fileID: 6084213820483535867}
   tilt_tf: {fileID: 3079738885164256514}
   wheel_tf: {fileID: 3420018188563993821}
@@ -5517,6 +5518,45 @@ MonoBehaviour:
   velocity: {x: 0, y: 0, z: 0}
   wheelRollSpeed: 0
   boostAmount: 0
+--- !u!114 &4858440571922573605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3307580917108127531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0263f000e5047ad4b9d9bc3c339258d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  move:
+    m_Name: Move
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 05c70af8-7be4-4977-bb3d-175944ccb394
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  jump:
+    m_Name: Jump
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 76020a41-2e31-4c03-b6a1-0e564ff6aba0
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  boost:
+    m_Name: Boost
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 00967fe4-b78b-4e1a-b1cc-34345eaf8af4
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
 --- !u!114 &267193551740860624
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5724,8 +5764,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3816179820547134928}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: -4}
+  m_LocalRotation: {x: 0.38268346, y: -0, z: -0, w: 0.9238795}
+  m_LocalPosition: {x: -0.0000009633901, y: 3.318427, z: -2.8284268}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5849,7 +5889,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   focus: {fileID: 6084213820483535867}
-  heightOffset: 1
+  heightOffset: 0.5
   distance: 3
   focusRadius: 0
   focusCentering: 0.5

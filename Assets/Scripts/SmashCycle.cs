@@ -133,9 +133,9 @@ public class SmashCycle : MonoBehaviour
 		desiredJump |= controls.jump.WasPressedThisFrame();
 		desiredBoost |= controls.boost.IsPressed();
 
-		#region Visuals using exterrnal transforms
 		//Vehicle body copy position
 		vehicleBody_tf.position = transform.position;
+		#region Visuals using exterrnal transforms
 
 		//Target look direction
 		Vector3 lookDir = (desiredVelocity.magnitude > 0.1f) ? desiredVelocity : vehicleBody_tf.forward;
@@ -148,7 +148,8 @@ public class SmashCycle : MonoBehaviour
 		seat_tf.rotation = Quaternion.Lerp(seat_tf.rotation, lookTarget, Time.deltaTime * 2f);
 
 		//Ball Tilt
-		float ballTiltSide = Mathf.Clamp(Vector3.SignedAngle(vehicleBody_tf.forward.normalized, rb.velocity.normalized, upAxis) / 90f, -1, 1);
+		Vector3 up = (OnGround) ? contactNormal : upAxis;
+		float ballTiltSide = Mathf.Clamp(Vector3.SignedAngle(vehicleBody_tf.forward.normalized, rb.velocity.normalized, up) / 90f, -1, 1);
 		float ballTiltAmount = (!OnGround) ? 0 : Mathf.Clamp(sideFriction.magnitude * 360f, 0f, 60f);
 		tilt_tf.localRotation = Quaternion.Lerp(tilt_tf.localRotation, Quaternion.Euler(0, 0, ballTiltAmount * ballTiltSide), Time.deltaTime * 4);
 
@@ -240,8 +241,8 @@ public class SmashCycle : MonoBehaviour
 		float maxSpeedChange = maxAcceleration * Time.deltaTime;
 
 		//Direction Vehicle is facing
-		Quaternion lookTarget = Quaternion.LookRotation(vehicleBody_tf.forward, upAxis);
 		Vector3 upDir = OnGround ? contactNormal : upAxis;
+		Quaternion lookTarget = Quaternion.LookRotation(vehicleBody_tf.forward, upDir);
 		//(0.1f is kinda hardcoded deadzone)
 		if (desiredVelocity.magnitude > 0.1f)
 		{
@@ -253,9 +254,7 @@ public class SmashCycle : MonoBehaviour
 		{
 			lookTarget = Quaternion.LookRotation(ProjectDirectionOnPlane(vehicleBody_tf.forward,upDir),upDir);
 		}
-		Debug.DrawLine(transform.position, transform.position+lookTarget * Vector3.forward * 3);
 		vehicleBody_tf.rotation = Quaternion.Lerp(vehicleBody_tf.rotation, lookTarget, turnSpeed);
-
 
 		//Tire side friction
 		if (OnGround)

@@ -29,11 +29,11 @@ public class GravityTube : GravitySource
 		Vector3 vector = pos2origin - Vector3.Dot(transform.up, pos2origin) * direction;
 		float distance = vector.magnitude;
 		//float distance = Vector3.Dot(transform.up, transform.position - position);
-		Debug.DrawLine(position, position + vector, Color.magenta);
 		if (directionRange > range || directionRange < 0 || distance > outerFalloffRadius || distance < innerFalloffRadius)
 		{
 			return Vector3.zero;
 		}
+		Debug.DrawLine(position, position + vector, Color.magenta);
 		if (!falloff)
 		{
 			return gravity * vector.normalized;

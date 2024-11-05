@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="800"
+   height="800"
+   viewBox="0 0 211.66666 211.66667"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   sodipodi:docname="Boost Bar.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="mm"
+     inkscape:zoom="1"
+     inkscape:cx="345"
+     inkscape:cy="334.5"
+     inkscape:window-width="2560"
+     inkscape:window-height="1494"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="Stop"
+       refX="0"
+       refY="4"
+       orient="auto"
+       inkscape:stockid="Stop"
+       markerWidth="1"
+       markerHeight="0.5"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="none">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1"
+         d="M 0,4 V -4"
+         id="path23" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#ffffff;fill-opacity:0;stroke:#ffffff;stroke-width:20;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path3"
+       sodipodi:type="arc"
+       sodipodi:cx="105.83334"
+       sodipodi:cy="105.83334"
+       sodipodi:rx="85"
+       sodipodi:ry="85"
+       sodipodi:start="0.34906585"
+       sodipodi:end="2.7925268"
+       sodipodi:arc-type="arc"
+       d="M 185.70722,134.90506 A 85,85 0 0 1 105.83334,190.83334 85,85 0 0 1 25.959471,134.90506"
+       sodipodi:open="true" />
+    <path
+       style="display:inline;fill:#ffffff;fill-opacity:0;stroke:#ffffff;stroke-width:5;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Stop);marker-mid:url(#Stop);marker-end:url(#Stop)"
+       id="path1"
+       sodipodi:type="arc"
+       sodipodi:cx="105.83334"
+       sodipodi:cy="105.83334"
+       sodipodi:rx="70"
+       sodipodi:ry="70"
+       sodipodi:start="0.17453293"
+       sodipodi:end="2.9670597"
+       sodipodi:arc-type="arc"
+       d="M 174.76989,117.98872 A 70,70 0 0 1 105.83334,175.83334 70,70 0 0 1 36.896801,117.98872"
+       sodipodi:open="true" />
+  </g>
+</svg>

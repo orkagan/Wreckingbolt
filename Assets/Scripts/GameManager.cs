@@ -39,7 +39,7 @@ public class GameManager : Singleton<GameManager>
     void Update()
     {
 		//Placeholder Controls
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.P))
 		{
 			if (CurrentGameState == GameState.Playing)
 			{

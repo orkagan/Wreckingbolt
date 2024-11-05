@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 public class PlayerInputHandler : MonoBehaviour
 {
 	PlayerInputActions playerControls;
-	public InputAction move, jump, boost;
+	public InputAction move, jump, boost, pause;
 
 	private void Awake()
 	{
@@ -23,7 +23,9 @@ public class PlayerInputHandler : MonoBehaviour
 
 		boost = playerControls.Player.Boost;
 		boost.Enable();
-		//boost.performed += BoostBurst;
+
+		pause = playerControls.Player.Pause;
+		pause.Enable();
 	}
 
 	private void OnDisable()
@@ -31,5 +33,6 @@ public class PlayerInputHandler : MonoBehaviour
 		move.Disable();
 		jump.Disable();
 		boost.Disable();
+		pause.Disable();
 	}
 }

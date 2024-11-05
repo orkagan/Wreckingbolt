@@ -167,6 +167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9.81
+  falloff: 1
   range: 100
 --- !u!1 &162113529
 GameObject:
@@ -213,6 +214,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9.81
+  falloff: 1
   range: 88.19
 --- !u!1 &209173867
 GameObject:
@@ -259,6 +261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 14.715
+  falloff: 1
   range: 10
 --- !u!1 &372804543
 GameObject:
@@ -460,7 +463,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &522479587
 RectTransform:
   m_ObjectHideFlags: 0
@@ -674,12 +677,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 903276360}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!20 &964024032 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 3992793317436425270, guid: 06c7870e30d916a46a3e364555171e7e,
-    type: 3}
-  m_PrefabInstance: {fileID: 1882125362}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1008726589
 GameObject:
   m_ObjectHideFlags: 0
@@ -1363,6 +1360,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9.81
+  falloff: 1
   range: 16.9
 --- !u!1 &1420726592
 GameObject:
@@ -1498,12 +1496,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1420726592}
   m_CullTransparentMesh: 1
---- !u!54 &1498939334 stripped
-Rigidbody:
-  m_CorrespondingSourceObject: {fileID: 7954557516404530509, guid: 06c7870e30d916a46a3e364555171e7e,
-    type: 3}
-  m_PrefabInstance: {fileID: 1882125362}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1510634465
 GameObject:
   m_ObjectHideFlags: 0
@@ -1769,13 +1761,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameState: 3
-  elements:
-  - panelState: 3
-    panelGameObj: {fileID: 522479586}
-    pauses: 0
-  - panelState: 4
-    panelGameObj: {fileID: 1159971759}
-    pauses: 1
 --- !u!4 &1856566132
 Transform:
   m_ObjectHideFlags: 0
@@ -1799,25 +1784,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 267193551740860624, guid: 06c7870e30d916a46a3e364555171e7e,
-        type: 3}
-      propertyPath: m_Camera
-      value: 
-      objectReference: {fileID: 964024032}
     - target: {fileID: 2728074471053841274, guid: 06c7870e30d916a46a3e364555171e7e,
         type: 3}
       propertyPath: m_Name
       value: SmashCycle
-      objectReference: {fileID: 0}
-    - target: {fileID: 3992793317436425270, guid: 06c7870e30d916a46a3e364555171e7e,
-        type: 3}
-      propertyPath: far clip plane
-      value: 1100
-      objectReference: {fileID: 0}
-    - target: {fileID: 5308683917365148432, guid: 06c7870e30d916a46a3e364555171e7e,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6879654098199474325, guid: 06c7870e30d916a46a3e364555171e7e,
         type: 3}
@@ -2027,9 +1997,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2db16f34a636c7e47bedb73d061a21aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movingTarget: {fileID: 1498939334}
-  speedometer: {fileID: 1924987344}
-  speed: 0
+  canvas_tf: {fileID: 0}
+  camera_tf: {fileID: 0}
+  player_tf: {fileID: 0}
+  speedometer_tf: {fileID: 0}
+  timer_tf: {fileID: 0}
+  boostBar: {fileID: 0}
+  HUDHeightOffset: 0.5
 --- !u!114 &1924987344
 MonoBehaviour:
   m_ObjectHideFlags: 0

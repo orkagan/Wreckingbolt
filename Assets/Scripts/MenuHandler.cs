@@ -39,7 +39,23 @@ public class MenuHandler : Singleton<MenuHandler>
             if (item.panelState == state)
             {
                 currentPanel = item.panelGameObj;
-                Time.timeScale = item.pauses ? 0 : 1;
+                //Time.timeScale = item.pauses ? 0 : 1;
+				if (item.pauses)
+				{
+                    Time.timeScale = 0;
+                    //Lock Cursor to middle of screen
+                    Cursor.lockState = CursorLockMode.None;
+                    //Hide Cursor from view
+                    Cursor.visible = true;
+                }
+				else
+				{
+                    Time.timeScale = 1;
+                    //Lock Cursor to middle of screen
+                    Cursor.lockState = CursorLockMode.Locked;
+                    //Hide Cursor from view
+                    Cursor.visible = false;
+				}
             }
         }
         //Enable panel of current state
