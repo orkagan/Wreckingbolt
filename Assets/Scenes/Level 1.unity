@@ -16143,10 +16143,10 @@ MonoBehaviour:
   gravity: -9.81
   range: 436
   falloff: 0
-  innerFalloffRadius: 3.9
-  innerRadius: 4.1
+  innerFalloffRadius: 2.29
+  innerRadius: 4.34
   outerRadius: 15.2
-  outerFalloffRadius: 15.2
+  outerFalloffRadius: 17.7
 --- !u!4 &1840707373
 Transform:
   m_ObjectHideFlags: 0

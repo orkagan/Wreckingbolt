@@ -77,6 +77,7 @@ public class GravityTube : GravitySource
 			Handles.DrawWireDisc(p + direction * range, transform.up, innerFalloffRadius);
 		}
 		Handles.color = Color.yellow;
+		Handles.DrawLine(p, p + direction * range);
 		if (innerRadius > 0f && innerRadius < outerRadius)
 		{
 			Handles.DrawWireDisc(p, transform.up, innerRadius);
