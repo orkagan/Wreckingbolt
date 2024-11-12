@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +20,10 @@ public class Timer : MonoBehaviour
     [SerializeField] float time = 0;
     [SerializeField] float tickRate = 1;
 
+
     public UnityEvent OnTimeUp;
+
+    public bool outputToLog = false;
     private void Start()
     {
         
@@ -79,4 +84,22 @@ public class Timer : MonoBehaviour
 	{
         running = !running;
 	}
+
+    public void DumpTimeToFile()
+	{
+        string path = $"{Application.streamingAssetsPath}/finishTimes.txt";
+        using (StreamWriter sw = File.AppendText(path))
+        {
+            sw.WriteLine(DateTime.Now.ToString() + ": " + FloatToMinSecMil(time));
+        }
+        // Open the file to read from.
+        using (StreamReader sr = File.OpenText(path))
+        {
+            string line = "";
+            while ((line = sr.ReadLine()) != null)
+            {
+                Debug.Log(line);
+            }
+        }
+    }
 }
