@@ -115,6 +115,10 @@ public class SmashCycle : MonoBehaviour
 
     private void Update()
     {
+		if (GameManager.Instance.CurrentGameState!=GameState.Playing)
+		{
+			return;
+		}
 		//Get player move input
 		playerInputMove = Vector2.ClampMagnitude(controls.move.ReadValue<Vector2>(), 1f);
 		//Convert input to camera space, else world space

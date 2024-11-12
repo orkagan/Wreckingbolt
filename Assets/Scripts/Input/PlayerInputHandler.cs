@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerInputHandler : MonoBehaviour
+public class PlayerInputHandler : Singleton<PlayerInputHandler>
 {
 	PlayerInputActions playerControls;
 	public InputAction move, jump, boost, pause;
 
-	private void Awake()
+	protected override void Awake()
 	{
+		base.Awake();
 		playerControls = new PlayerInputActions();
 	}
 

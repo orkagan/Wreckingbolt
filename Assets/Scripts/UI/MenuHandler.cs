@@ -2,16 +2,28 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
+/// <summary>
+/// Handles the different menu states
+/// </summary>
+public enum MenuState
+{
+    Main,
+    Options,
+}
 
 public class MenuHandler : Singleton<MenuHandler>
 {
     [Serializable]
     public struct Element
     {
-        public GameState panelState;
+        public GameState gameState;
         public GameObject panelGameObj;
         public bool pauses;
+        public Button selectedButton;
     }
+    
     /// <summary>
     /// Stores the UI panel associated with a state and if it should pause the game.
     /// </summary>
@@ -36,16 +48,17 @@ public class MenuHandler : Singleton<MenuHandler>
         {
             //Disable other panels
             item.panelGameObj.SetActive(false);
-            if (item.panelState == state)
+            if (item.gameState == state)
             {
                 currentPanel = item.panelGameObj;
+                if (item.selectedButton != null) item.selectedButton.Select();
                 //Time.timeScale = item.pauses ? 0 : 1;
 				if (item.pauses)
 				{
                     Time.timeScale = 0;
-                    //Lock Cursor to middle of screen
+                    //Unlock cursor
                     Cursor.lockState = CursorLockMode.None;
-                    //Hide Cursor from view
+                    //Make cursor visible
                     Cursor.visible = true;
                 }
 				else
@@ -55,10 +68,29 @@ public class MenuHandler : Singleton<MenuHandler>
                     Cursor.lockState = CursorLockMode.Locked;
                     //Hide Cursor from view
                     Cursor.visible = false;
+                    //PlayerInputHandler.Instance.EnableControls();
 				}
             }
         }
         //Enable panel of current state
         currentPanel.SetActive(true);
     }
+    public void SwitchMenuPanel()
+	{
+
+	}
+
+    public static void ExitGame()
+    {
+        Application.Quit();
+#if UNITY_EDITOR
+        Debug.Log("ExitGame called.");
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
+    }
+
+    public void CursorVisibility(bool visibility)
+	{
+        Cursor.visible = visibility;
+	}
 }

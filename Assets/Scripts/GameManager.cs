@@ -5,14 +5,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 
+/// <summary>
+/// States for gameplay
+/// </summary>
 public enum GameState
 {
-    MainMenu,
-    LevelSelect,
-    Options,
+    Starting,
     Playing,
     Paused,
-    Win
+    Win,
+    Lose
 }
 public class GameManager : Singleton<GameManager>
 {
@@ -31,15 +33,11 @@ public class GameManager : Singleton<GameManager>
             OnGameStateChanged?.Invoke(CurrentGameState);
         }
     }
-
-    private void Start()
-    {
-        
-    }
     void Update()
     {
 		//Placeholder Controls
-        if (Input.GetKeyDown(KeyCode.P))
+        //if (Input.GetKeyDown(KeyCode.P))
+        if (PlayerInputHandler.Instance.pause.WasPressedThisFrame())
 		{
 			if (CurrentGameState == GameState.Playing)
 			{
@@ -61,13 +59,36 @@ public class GameManager : Singleton<GameManager>
     {
         CurrentGameState = GameState.Win;
     }
+    public void Lose()
+    {
+        CurrentGameState = GameState.Lose;
+    }
     public void ChangeGameState(string targetState)
     {
         CurrentGameState = (GameState)System.Enum.Parse(typeof(GameState), targetState);
     }
-
     public void ChangeGameState(GameState gameState)
     {
+        
+		switch (CurrentGameState)
+		{
+			case GameState.Starting:
+				if (gameState==GameState.Playing)
+				{
+
+				}
+				break;
+			case GameState.Playing:
+				break;
+			case GameState.Paused:
+				break;
+			case GameState.Win:
+				break;
+			case GameState.Lose:
+				break;
+			default:
+				break;
+		}
         CurrentGameState = gameState;
     }
 
@@ -88,15 +109,5 @@ public class GameManager : Singleton<GameManager>
     {
         //reloads current scene
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-
-
-    public static void ExitGame()
-    {
-        Application.Quit();
-#if UNITY_EDITOR
-        Debug.Log("ExitGame called.");
-        UnityEditor.EditorApplication.isPlaying = false;
-#endif
     }
 }

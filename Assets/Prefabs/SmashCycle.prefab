@@ -95,8 +95,9 @@ MonoBehaviour:
   canvas_tf: {fileID: 883740306594372987}
   camera_tf: {fileID: 4845264250766932453}
   player_tf: {fileID: 8385120388563151731}
-  speedometer_tf: {fileID: 9203564778577559873}
-  timer_tf: {fileID: 8260369571933940328}
+  transformsToFaceCamera:
+  - {fileID: 9203564778577559873}
+  - {fileID: 8260369571933940328}
   boostBar: {fileID: 6617310624729571232}
   HUDHeightOffset: 0.5
 --- !u!1 &661490851612292656
@@ -5557,6 +5558,15 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
+  pause:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 1009aa00-03a5-439e-a98e-d79adb56c400
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
 --- !u!114 &267193551740860624
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5735,7 +5745,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce6543345682fc7449d90fb899e55e38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timeFormat: 0
+  running: 0
+  timerTexts: []
   time: 0
+  tickRate: 1
+  OnTimeUp:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3816179820547134928
 GameObject:
   m_ObjectHideFlags: 0
@@ -5765,7 +5782,7 @@ Transform:
   m_GameObject: {fileID: 3816179820547134928}
   serializedVersion: 2
   m_LocalRotation: {x: 0.38268346, y: -0, z: -0, w: 0.9238795}
-  m_LocalPosition: {x: -0.0000009633901, y: 3.318427, z: -2.8284268}
+  m_LocalPosition: {x: -0.00000013783574, y: 2.6113203, z: -2.1213226}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

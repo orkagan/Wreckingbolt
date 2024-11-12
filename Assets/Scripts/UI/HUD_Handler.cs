@@ -9,8 +9,7 @@ public class HUD_Handler : MonoBehaviour
     public RectTransform canvas_tf;
     public Transform camera_tf;
     public Transform player_tf;
-    public Transform speedometer_tf;
-    public Transform timer_tf;
+    public List<Transform> transformsToFaceCamera;
     
     private OrbitCamera camera_script;
     private SmashCycle player_script;
@@ -38,8 +37,11 @@ public class HUD_Handler : MonoBehaviour
 
         /*speedometer.transform.rotation = Quaternion.LookRotation(speedometer.transform.position - camera_tf.position, upAxis);
         timer_tf.rotation = Quaternion.LookRotation(timer_tf.position - camera_tf.position, upAxis);*/
-        LookAtCamera(speedometer_tf);
-        LookAtCamera(timer_tf);
+		foreach (Transform item in transformsToFaceCamera)
+		{
+            LookAtCamera(item);
+		}
+
     }
 
     void LookAtCamera(Transform tf)
