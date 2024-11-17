@@ -54,7 +54,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Edge_Glow_Strength: 1
+    - _Edge_Glow_Strength: 5
     - _Energy_Noise_Scale: 10
     - _Energy_Noise_Strength: 0.5
     - _Intersection_Strength: 5
@@ -68,7 +68,7 @@ Material:
     - _USE_INTERSECTION_GLOW: 1
     m_Colors:
     - _Base_Color: {r: 1, g: 0.5502789, b: 0.16509432, a: 0.6862745}
-    - _Edge_Glow_Thickness: {r: 0.05, g: 0.05, b: 0, a: 0}
-    - _Emission_Color: {r: 1.4692377, g: 0.34098, b: 0, a: 1}
+    - _Edge_Glow_Thickness: {r: 0.04, g: 0.04, b: 0, a: 0}
+    - _Emission_Color: {r: 2.9960783, g: 0.6953285, b: 0, a: 1}
     - _Energy_Noise_Speed: {r: 0, g: -1, b: 0, a: 0}
   m_BuildTextureStacks: []

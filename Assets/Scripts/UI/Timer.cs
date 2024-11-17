@@ -40,7 +40,7 @@ public class Timer : MonoBehaviour
 			}
         }
 
-        //WHY AM I DOING THIS
+        //If ticking down: work like a timer, WHY AM I DOING THIS
         if (tickRate < 0 & time > 0)
         {
             time += tickRate * Time.unscaledDeltaTime; //time where 1 = 1 second
@@ -93,13 +93,13 @@ public class Timer : MonoBehaviour
             sw.WriteLine(DateTime.Now.ToString() + ": " + FloatToMinSecMil(time));
         }
         // Open the file to read from.
-        using (StreamReader sr = File.OpenText(path))
+        /*using (StreamReader sr = File.OpenText(path))
         {
             string line = "";
             while ((line = sr.ReadLine()) != null)
             {
                 Debug.Log(line);
             }
-        }
+        }*/
     }
 }

@@ -6864,7 +6864,7 @@ MonoBehaviour:
   priority: 0
   blendDistance: 0
   weight: 1
-  sharedProfile: {fileID: 11400000, guid: 551250b68430b634aa506fb9a0aa0ffd, type: 2}
+  sharedProfile: {fileID: 11400000, guid: a6560a915ef98420e9faacc1c7438823, type: 2}
 --- !u!4 &695731280
 Transform:
   m_ObjectHideFlags: 0
@@ -24773,6 +24773,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SmashCycle
+      objectReference: {fileID: 0}
+    - target: {fileID: 2824612814941912593, guid: 06c7870e30d916a46a3e364555171e7e,
+        type: 3}
+      propertyPath: m_Parameters.widthMultiplier
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 3983497808242190431, guid: 06c7870e30d916a46a3e364555171e7e,
+        type: 3}
+      propertyPath: m_RenderPostProcessing
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3983497808242190431, guid: 06c7870e30d916a46a3e364555171e7e,
+        type: 3}
+      propertyPath: m_VolumeLayerMask.m_Bits
+      value: 33
       objectReference: {fileID: 0}
     - target: {fileID: 4858440571922573605, guid: 06c7870e30d916a46a3e364555171e7e,
         type: 3}
