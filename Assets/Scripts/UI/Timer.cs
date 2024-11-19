@@ -90,7 +90,9 @@ public class Timer : MonoBehaviour
         string path = $"{Application.streamingAssetsPath}/finishTimes.txt";
         using (StreamWriter sw = File.AppendText(path))
         {
-            sw.WriteLine(DateTime.Now.ToString() + ": " + FloatToMinSecMil(time));
+            string line = DateTime.Now.ToString() + ": " + FloatToMinSecMil(time);
+            Debug.Log(line);
+            sw.WriteLine(line);
         }
         // Open the file to read from.
         /*using (StreamReader sr = File.OpenText(path))

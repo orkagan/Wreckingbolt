@@ -11,6 +11,7 @@ public class SmashCycle : MonoBehaviour
 	[SerializeField] float maxSpeed = 20f;
 	[SerializeField] float maxAngularVelocity = 20f;
 	[SerializeField] float maxAcceleration = 10f;
+	[SerializeField] float maxAirAcceleration = 2f;
 	[SerializeField, Range(0,1)] float frictionCoefficient = 0.02f;
 	[SerializeField] float turnSpeed = 0.05f;
 	[SerializeField] float jumpHeight = 10f;
@@ -135,7 +136,7 @@ public class SmashCycle : MonoBehaviour
 		desiredVelocity = (rightAxis* playerInputMove.x + forwardAxis * playerInputMove.y) * maxSpeed;
 
 		desiredJump |= controls.jump.WasPressedThisFrame();
-		desiredBoost |= controls.boost.IsPressed();
+		desiredBoost |= controls.boost.WasPressedThisFrame();
 
 		//Vehicle body copy position
 		vehicleBody_tf.position = transform.position;
@@ -195,6 +196,7 @@ public class SmashCycle : MonoBehaviour
 			desiredJump = false;
 			Jump(gravity);
         }
+
 		Boost();
 
 		velocity += gravity * Time.deltaTime;
@@ -242,7 +244,7 @@ public class SmashCycle : MonoBehaviour
 
 	void AdjustVelocity()
 	{
-		float maxSpeedChange = maxAcceleration * Time.deltaTime;
+		//float maxSpeedChange = maxAcceleration * Time.deltaTime;
 
 		//Direction Vehicle is facing
 		Vector3 upDir = OnGround ? contactNormal : upAxis;
@@ -270,6 +272,7 @@ public class SmashCycle : MonoBehaviour
 		else
 		{
 			sideFriction = Vector3.zero;
+			velocity += desiredVelocity.normalized * maxAirAcceleration * Time.deltaTime;
 		}
 
 		//Appply forces
@@ -327,7 +330,12 @@ public class SmashCycle : MonoBehaviour
 	}*/
 	private void Boost()
 	{
-		if (controls.boost.IsPressed() & BoostAmount > 0)
+		if(!controls.boost.IsPressed() || BoostAmount <= 0)
+		{
+			desiredBoost = false;
+		}
+
+		if (desiredBoost)
 		{
 			jetThrustFX.Play();
 			rb.AddForce(desiredVelocity.normalized * boostPower);

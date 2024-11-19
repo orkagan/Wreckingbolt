@@ -20,6 +20,9 @@ public class OrbitCamera : MonoBehaviour
 	[SerializeField, Range(0f, 1f)]
 	float focusCentering = 0.5f;
 
+	[SerializeField, Range(0f, 89f)]
+	float defaultVerticalAngle = 20f;
+
 	[SerializeField, Range(1f, 360f)]
 	float rotationSpeed = 90f;
 
@@ -42,13 +45,16 @@ public class OrbitCamera : MonoBehaviour
 
 	Vector3 focusPoint, previousFocusPoint;
 
-	Vector2 orbitAngles = new Vector2(45f, 0f);
+	Vector2 orbitAngles;
 
 	float lastManualRotationTime;
 
 	public Quaternion gravityAlignment = Quaternion.identity;
 
 	Quaternion orbitRotation;
+
+	public float zoomRatio = 0.5f;
+	public float defaultFOV = 70f;
 
 	Vector3 CameraHalfExtends
 	{
@@ -90,7 +96,9 @@ public class OrbitCamera : MonoBehaviour
 
 		regularCamera = GetComponent<Camera>();
 		focusPoint = focus.position;
-		transform.localRotation = orbitRotation = Quaternion.Euler(orbitAngles);
+		//transform.localRotation = orbitRotation = Quaternion.Euler(orbitAngles);
+		orbitRotation = transform.localRotation;
+		orbitAngles = transform.localRotation.eulerAngles;
 	}
 
 	void LateUpdate()
@@ -126,6 +134,14 @@ public class OrbitCamera : MonoBehaviour
 		}
 		
 		transform.SetPositionAndRotation(lookPosition, lookRotation);
+	}
+
+	private void FixedUpdate()
+	{
+		float acc = focus.GetComponent<Rigidbody>().velocity.magnitude;
+		float targetFOV = defaultFOV + acc * zoomRatio;
+		//regularCamera.fieldOfView = Mathf.Lerp(regularCamera.fieldOfView, targetFOV, Mathf.SmoothStep(0,1,Time.deltaTime));
+		regularCamera.fieldOfView = Mathf.Lerp(regularCamera.fieldOfView, targetFOV, Time.deltaTime * 10f);
 	}
 
 	void UpdateGravityAlignment()
@@ -219,6 +235,8 @@ public class OrbitCamera : MonoBehaviour
 		}
 		orbitAngles.y =
 			Mathf.MoveTowardsAngle(orbitAngles.y, headingAngle, rotationChange);
+		orbitAngles.x = 
+			Mathf.MoveTowardsAngle(orbitAngles.x, defaultVerticalAngle, rotationChange);
 		return true;
 	}
 
