@@ -245,9 +245,9 @@ public class SmashCycle : MonoBehaviour
 	void AdjustVelocity()
 	{
 		//float maxSpeedChange = maxAcceleration * Time.deltaTime;
-
-		//Direction Vehicle is facing
+		//determines what is "up"
 		Vector3 upDir = OnGround ? contactNormal : upAxis;
+		//Direction Vehicle is facing
 		Quaternion lookTarget = Quaternion.LookRotation(vehicleBody_tf.forward, upDir);
 		//(0.1f is kinda hardcoded deadzone)
 		if (desiredVelocity.magnitude > 0.1f)
@@ -380,17 +380,15 @@ public class SmashCycle : MonoBehaviour
 		velocity += jumpDirection * jumpSpeed;
 	}
 
-	void OnCollisionEnter(Collision collision)
+	/*void OnCollisionEnter(Collision collision)
 	{
 		EvaluateCollision(collision);
-		//Debug.Log("Collision Enter");
 	}
 
 	void OnCollisionExit(Collision collision)
 	{
 		EvaluateCollision(collision);
-		//Debug.Log("Collision Exit");
-	}
+	}*/
 
 	void OnCollisionStay(Collision collision)
 	{

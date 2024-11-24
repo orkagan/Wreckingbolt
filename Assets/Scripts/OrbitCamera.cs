@@ -55,6 +55,7 @@ public class OrbitCamera : MonoBehaviour
 
 	public float zoomRatio = 0.5f;
 	public float defaultFOV = 70f;
+	public float fovLerpSpeed = 20f;
 
 	Vector3 CameraHalfExtends
 	{
@@ -141,7 +142,8 @@ public class OrbitCamera : MonoBehaviour
 		float acc = focus.GetComponent<Rigidbody>().velocity.magnitude;
 		float targetFOV = defaultFOV + acc * zoomRatio;
 		//regularCamera.fieldOfView = Mathf.Lerp(regularCamera.fieldOfView, targetFOV, Mathf.SmoothStep(0,1,Time.deltaTime));
-		regularCamera.fieldOfView = Mathf.Lerp(regularCamera.fieldOfView, targetFOV, Time.deltaTime * 10f);
+		float blend = Mathf.Pow(0.5f, Time.deltaTime * fovLerpSpeed);
+		regularCamera.fieldOfView = Mathf.Lerp(targetFOV, regularCamera.fieldOfView, blend);
 	}
 
 	void UpdateGravityAlignment()

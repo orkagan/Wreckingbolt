@@ -24855,6 +24855,11 @@ PrefabInstance:
       propertyPath: m_MinVertexDistance
       value: 0.05
       objectReference: {fileID: 0}
+    - target: {fileID: 3383474288428098861, guid: 06c7870e30d916a46a3e364555171e7e,
+        type: 3}
+      propertyPath: fovLerpSpeed
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 6879654098199474325, guid: 06c7870e30d916a46a3e364555171e7e,
         type: 3}
       propertyPath: m_LocalPosition.x
