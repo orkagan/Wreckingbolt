@@ -65,7 +65,7 @@ public class GravityTube : GravitySource
 		innerFalloffFactor = 1f / (innerRadius - innerFalloffRadius);
 		outerFalloffFactor = 1f / (outerFalloffRadius - outerRadius);
 	}
-
+#if UNITY_EDITOR
 	void OnDrawGizmos()
 	{
 		Vector3 p = transform.position;
@@ -92,4 +92,5 @@ public class GravityTube : GravitySource
 			Handles.DrawWireDisc(p + direction * range, transform.up, outerFalloffRadius);
 		}
 	}
+#endif
 }
